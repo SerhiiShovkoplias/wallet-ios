@@ -1,4 +1,4 @@
-//  RecoveryPhraseViewController.swift
+//  SeedPhraseViewController.swift
 
 /*
 	Package MobileWallet
@@ -40,17 +40,17 @@
 
 import UIKit
 
-class RecoveryPhraseViewController: SettingsParentViewController {
+class SeedPhraseViewController: SettingsParentViewController {
     private let descriptionLabel = UILabel()
     private let continueButton = ActionButton()
-    private var phraseView: RecoveryPhraseView?
+    private var phraseView: WordsFlexView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
     }
 }
 
-extension RecoveryPhraseViewController {
+extension SeedPhraseViewController {
     override func setupViews() {
         super.setupViews()
         setupHeader()
@@ -99,6 +99,6 @@ extension RecoveryPhraseViewController {
     }
 
     @objc private func continueButtonAction() {
-        navigationController?.pushViewController(ConfirmPhraseViewController(), animated: true)
+        navigationController?.pushViewController(VerifyPhraseViewController(), animated: true)
     }
 }

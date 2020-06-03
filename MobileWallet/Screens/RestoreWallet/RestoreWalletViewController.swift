@@ -93,8 +93,8 @@ extension RestoreWalletViewController: UITableViewDelegate, UITableViewDataSourc
 // MARK: Setup subviews
 extension RestoreWalletViewController {
     private func setupView() {
-        view.backgroundColor = Theme.shared.colors.restoreWalletBackground
-        navigationBar.backgroundColor = Theme.shared.colors.restoreWalletBackground
+        view.backgroundColor = Theme.shared.colors.settingsTableStyleBackground
+        navigationBar.backgroundColor = Theme.shared.colors.settingsTableStyleBackground
         setupNavigationBar()
         setupTableView()
     }
@@ -117,7 +117,7 @@ extension RestoreWalletViewController {
         tableView.delegate = self
         tableView.backgroundColor = .clear
         tableView.isScrollEnabled = false
-        tableView.separatorColor = Theme.shared.colors.restoreWalletBackground
+        tableView.separatorColor = Theme.shared.colors.settingsTableStyleBackground
 
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false

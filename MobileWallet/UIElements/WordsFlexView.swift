@@ -1,4 +1,4 @@
-//  RecoveryPhraseView.swift
+//  WordsFlexView.swift
 
 /*
  Package MobileWallet
@@ -40,19 +40,19 @@
 
 import UIKit
 
-protocol RecoveryPhraseViewDelegate: class {
-    func didSelectWord(word: String, intId: Int, phraseView: RecoveryPhraseView)
+protocol WordsFlexViewDelegate: class {
+    func didSelectWord(word: String, intId: Int, phraseView: WordsFlexView)
 }
 
-class RecoveryPhraseView: UIView {
+class WordsFlexView: UIView {
 
-    enum RecoveryPhraseViewType {
+    enum WordsFlexViewType {
         case selectable
         case fillable
     }
 
-    weak var delegate: RecoveryPhraseViewDelegate?
-    let type: RecoveryPhraseViewType
+    weak var delegate: WordsFlexViewDelegate?
+    let type: WordsFlexViewType
 
     private(set) var words = [String]()
 
@@ -75,7 +75,7 @@ class RecoveryPhraseView: UIView {
 
     private var heightConstraint: NSLayoutConstraint?
 
-    init(type: RecoveryPhraseViewType,
+    init(type: WordsFlexViewType,
          words: [String],
          width: CGFloat,
          minimumHeight: CGFloat = 27,
@@ -101,7 +101,7 @@ class RecoveryPhraseView: UIView {
         setup(words: words, width: width)
     }
 
-    init(type: RecoveryPhraseViewType,
+    init(type: WordsFlexViewType,
          minimumHeight: CGFloat,
          maxCountInRaw: Int = 4,
          horizontalSpacing: CGFloat = 12,
@@ -162,9 +162,15 @@ class RecoveryPhraseView: UIView {
             }
         }
     }
-    
+
     @objc private func buttonAction(_ sender: UIButton) {
         guard let word = sender.titleLabel?.text, let index = buttons.firstIndex(of: sender) else { return }
+
+        if type == .fillable {
+            words.remove(at: index)
+            buttons.remove(at: index)
+        }
+
         delegate?.didSelectWord(word: word, intId: sender.tag, phraseView: self)
 
         UIView.animate(withDuration: CATransaction.animationDuration(), animations: {
@@ -173,10 +179,7 @@ class RecoveryPhraseView: UIView {
             guard let self = self else { return }
             switch self.type {
             case .fillable: do {
-                self.words.remove(at: index)
-                self.buttons.remove(at: index)
                 self.stackView.removeFromSuperview()
-
                 self.stackView = UIStackView()
                 self.subStackViews = self.createSubStackViews(intrinsicWidth: self.bounds.width)
                 self.setupStackView(horizontalStackViews: self.subStackViews)
@@ -188,7 +191,7 @@ class RecoveryPhraseView: UIView {
 }
 
 // MARK: Private Methods
-extension RecoveryPhraseView {
+extension WordsFlexView {
     private func setup(words: [String], width: CGFloat) {
         buttons = createButtons(words: words)
         subStackViews = createSubStackViews(intrinsicWidth: width)

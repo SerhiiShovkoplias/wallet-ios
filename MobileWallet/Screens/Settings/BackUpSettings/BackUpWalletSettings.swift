@@ -69,7 +69,7 @@ class BackUpWalletSettings: SettingsParentTableViewController {
     }
 
     private func onBackUpWithRecoveryPhraseAction() {
-        navigationController?.pushViewController(RecoveryPhraseViewController(), animated: true)
+        navigationController?.pushViewController(SeedPhraseViewController(), animated: true)
     }
 }
 
