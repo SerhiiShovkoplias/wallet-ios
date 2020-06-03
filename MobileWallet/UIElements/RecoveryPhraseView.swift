@@ -143,18 +143,25 @@ class RecoveryPhraseView: UIView {
     }
 
     private func findLastFreeSubStackView(for button: UIButton) -> UIStackView? {
-        let lastSubStackView = subStackViews.last { (stackView) -> Bool in
-            var buttonsCount = 0
-            var width: CGFloat = 0
-            stackView.subviews.forEach({
-                if $0 is UIButton {
-                    buttonsCount += 1
-                    width += $0.bounds.width + stackView.spacing
-                }
-            })
-            return buttonsCount < maxCountInRaw && bounds.width > (width + button.intrinsicContentSize.width)
+        var buttonsCount = 0
+        var width: CGFloat = 0
+
+        subStackViews.last?.subviews.forEach({
+            if $0 is UIButton {
+                buttonsCount += 1
+                width += $0.bounds.width
+            }
+        })
+
+        width += CGFloat(buttonsCount - 1) * horizontalSpacing
+
+        let buttonWidth = (button.titleLabel?.intrinsicContentSize.width ?? 0.0) + minimumInsets.left + minimumInsets.right
+
+        if buttonsCount < maxCountInRaw && bounds.width > (width + buttonWidth + horizontalSpacing) {
+            return subStackViews.last
+        } else {
+            return nil
         }
-        return lastSubStackView
     }
 
     private func setup(words: [String], width: CGFloat) {
@@ -178,8 +185,9 @@ class RecoveryPhraseView: UIView {
             button.layer.borderColor = showBorder ? buttonBorderColor.cgColor : UIColor.clear.cgColor
             button.layer.borderWidth = 1.0
             button.layer.masksToBounds = true
-            let widthConstraint =  button.widthAnchor.constraint(equalToConstant: (button.intrinsicContentSize.width + minimumInsets.left + minimumInsets.right))
+            let widthConstraint =  button.widthAnchor.constraint(equalToConstant: ((button.titleLabel?.intrinsicContentSize.width ?? 0.0) + minimumInsets.left + minimumInsets.right))
             widthConstraint.isActive = true
+            widthConstraint.priority = .defaultHigh
 
             intrinsicButtons.append(button)
         })
@@ -241,13 +249,16 @@ class RecoveryPhraseView: UIView {
 
         views.forEach {
             guard let button = $0 as? UIButton else { return }
-            let buttonWidth = button.bounds.width > 0 ? button.bounds.width : (button.titleLabel?.font.pointSize ?? 0.0) + minimumInsets.left + minimumInsets.right
-            width += buttonWidth + horizontalSpacing
-
+            let buttonWidth = (button.titleLabel?.intrinsicContentSize.width ?? 0.0) + minimumInsets.left + minimumInsets.right
+            width += buttonWidth
             stackView.addArrangedSubview(button)
         }
 
-        if views.count < maxCountInRaw || width < intrinsicWidth {
+        width += CGFloat(views.count - 1) * horizontalSpacing
+
+        if views.count == maxCountInRaw {
+            stackView.widthAnchor.constraint(equalToConstant: width).isActive = true
+        } else {
             let stubView = UIView()
             stubView.backgroundColor = .clear
             let widthConstraint = stubView.widthAnchor.constraint(equalToConstant: intrinsicWidth - width)
@@ -263,6 +274,7 @@ class RecoveryPhraseView: UIView {
         stackView.axis = .vertical
         stackView.distribution = .fillEqually
         stackView.spacing = verticalSpacing
+        stackView.alignment = .leading
 
         horizontalStackViews.forEach {
             stackView.addArrangedSubview($0)
