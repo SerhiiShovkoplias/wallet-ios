@@ -88,11 +88,12 @@ extension ConfirmPhraseViewController {
         confirmPhraseContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
         confirmPhraseContainer.heightAnchor.constraint(greaterThanOrEqualToConstant: 50).isActive = true
 
-        confirmRecoveryPhraseView = RecoveryPhraseView(minimumHeight: 15.0,
+        confirmRecoveryPhraseView = RecoveryPhraseView(type: .fillable,
+                                                       minimumHeight: 17.0,
                                                        maxCountInRaw: 5,
                                                        horizontalSpacing: 20.0,
-                                                       verticalSpacing: 15,
-                                                       minimumInsets: .zero,
+                                                       verticalSpacing: 10,
+                                                       minimumInsets: UIEdgeInsets(top: 3.0, left: 1.0, bottom: 3.0, right: 1.0),
                                                        showBorder: false)
 
         confirmRecoveryPhraseView?.delegate = self
@@ -108,7 +109,7 @@ extension ConfirmPhraseViewController {
     private func setupPhraseView() {
         let words = ["Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo", "Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo", "Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo", "Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo"]
 
-        phraseView = RecoveryPhraseView(words: words, width: (view.bounds.width - 50))
+        phraseView = RecoveryPhraseView(type: .selectable, words: words, width: (view.bounds.width - 50))
         phraseView?.delegate = self
 
         view.addSubview(phraseView!)
@@ -147,7 +148,8 @@ extension ConfirmPhraseViewController {
 }
 
 extension ConfirmPhraseViewController: RecoveryPhraseViewDelegate {
-    func didSelectWord(_ word: String, phraseView: RecoveryPhraseView) {
+    func didSelectWord(word: String, index: Int, phraseView: RecoveryPhraseView) {
+        if phraseView == confirmRecoveryPhraseView { return }
         confirmRecoveryPhraseView?.addWords([word])
     }
 }

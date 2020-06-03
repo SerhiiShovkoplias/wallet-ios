@@ -66,7 +66,7 @@ class WalletCreationViewController: UIViewController {
     private var playerLooper: AVPlayerLooper!
     private var videoView = UIView()
 
-    private let stackView = UIStackView()
+    private var stackView = UIStackView()
     private var stackViewCenterYConstraint: NSLayoutConstraint?
 
     private var numpadImageView = UIImageView()

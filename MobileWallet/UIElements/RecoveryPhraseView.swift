@@ -41,13 +41,22 @@
 import UIKit
 
 protocol RecoveryPhraseViewDelegate: class {
-    func didSelectWord(_ word: String, phraseView: RecoveryPhraseView)
+    func didSelectWord(word: String, index: Int, phraseView: RecoveryPhraseView)
 }
 
 class RecoveryPhraseView: UIView {
-    weak var delegate: RecoveryPhraseViewDelegate?
 
-    private let stackView = UIStackView()
+    enum RecoveryPhraseViewType {
+        case selectable
+        case fillable
+    }
+
+    weak var delegate: RecoveryPhraseViewDelegate?
+    let type: RecoveryPhraseViewType
+
+    private(set) var words = [String]()
+
+    private var stackView = UIStackView()
     private var subStackViews = [UIStackView]()
     private var buttons = [UIButton]()
 
@@ -66,7 +75,8 @@ class RecoveryPhraseView: UIView {
 
     private var heightConstraint: NSLayoutConstraint?
 
-    init(words: [String],
+    init(type: RecoveryPhraseViewType,
+         words: [String],
          width: CGFloat,
          minimumHeight: CGFloat = 27,
          maxCountInRaw: Int = 4,
@@ -76,6 +86,7 @@ class RecoveryPhraseView: UIView {
          cornerRadius: CGFloat = 5.0,
          showBorder: Bool = true) {
 
+        self.type = type
         self.minimumHeight = minimumHeight
         self.maxCountInRaw = maxCountInRaw
         self.horizontalSpacing = horizontalSpacing
@@ -84,11 +95,14 @@ class RecoveryPhraseView: UIView {
         self.cornerRadius = cornerRadius
         self.showBorder = showBorder
 
+        self.words = words
+
         super.init(frame: .zero)
         setup(words: words, width: width)
     }
 
-    init(minimumHeight: CGFloat,
+    init(type: RecoveryPhraseViewType,
+         minimumHeight: CGFloat,
          maxCountInRaw: Int = 4,
          horizontalSpacing: CGFloat = 12,
          verticalSpacing: CGFloat = 14,
@@ -96,6 +110,7 @@ class RecoveryPhraseView: UIView {
          cornerRadius: CGFloat = 5.0,
          showBorder: Bool = true) {
 
+        self.type = type
         self.minimumHeight = minimumHeight
         self.maxCountInRaw = maxCountInRaw
         self.horizontalSpacing = horizontalSpacing
@@ -114,9 +129,22 @@ class RecoveryPhraseView: UIView {
     }
 
     @objc private func buttonAction(_ sender: UIButton) {
-        delegate?.didSelectWord(sender.titleLabel?.text ?? "", phraseView: self)
-        UIView.animate(withDuration: CATransaction.animationDuration()) {
+        guard let word = sender.titleLabel?.text, let index = buttons.firstIndex(of: sender) else { return }
+        delegate?.didSelectWord(word: word, index: index, phraseView: self)
+
+        UIView.animate(withDuration: CATransaction.animationDuration(), animations: {
             sender.alpha = 0.0
+        }) { [weak self] (_) in
+            guard let self = self else { return }
+            switch self.type {
+            case .fillable: do {
+                self.words.remove(at: index)
+                self.stackView.removeFromSuperview()
+                self.stackView = UIStackView()
+                self.setup(words: self.words, width: self.bounds.width)
+                }
+            default: break
+            }
         }
     }
 
@@ -130,7 +158,6 @@ class RecoveryPhraseView: UIView {
                 stackView.addArrangedSubview(newStackView)
                 return
             }
-            buttons.append(button)
             var existingButtons = lastStackView.subviews.filter({ $0 is UIButton })
             existingButtons.append(button)
             stackView.removeArrangedSubview(lastStackView)
@@ -139,6 +166,8 @@ class RecoveryPhraseView: UIView {
             subStackViews.append(newStack)
             stackView.addArrangedSubview(newStack)
         }
+        buttons += newButtons
+        self.words += words
         heightConstraint?.constant = heightForStackView()
     }
 
@@ -200,15 +229,9 @@ class RecoveryPhraseView: UIView {
         var currentStack = [UIView]()
 
         buttons.forEach({
-            var labelWidth: CGFloat
+            let buttonWidth = ($0.titleLabel?.intrinsicContentSize.width ?? 0.0) + minimumInsets.left + minimumInsets.right
 
-            if $0.bounds.width > 0 {
-                labelWidth = $0.bounds.width
-            } else {
-                labelWidth = $0.intrinsicContentSize.width + minimumInsets.left + minimumInsets.right
-            }
-
-            let newWidth = (width + labelWidth + CGFloat(currentStack.count - 1) * horizontalSpacing)
+            let newWidth = width + buttonWidth
 
             if newWidth <= intrinsicWidth {
                 currentStack.append($0)
@@ -226,14 +249,18 @@ class RecoveryPhraseView: UIView {
                 currentStack.removeAll()
                 currentStack.append($0)
 
-                if $0 == buttons.last {
-                    stackViews.append(horizontalStackView(with: currentStack, intrinsicWidth: intrinsicWidth))
-                    currentStack.removeAll()
-                }
                 width = 0.0
             }
 
-            width += labelWidth
+            if $0 == buttons.last {
+                stackViews.append(horizontalStackView(with: currentStack, intrinsicWidth: intrinsicWidth))
+                currentStack.removeAll()
+
+                width = 0.0
+
+            }
+
+            width += (buttonWidth + horizontalSpacing)
         })
 
         return stackViews
@@ -257,7 +284,9 @@ class RecoveryPhraseView: UIView {
         width += CGFloat(views.count - 1) * horizontalSpacing
 
         if views.count == maxCountInRaw {
-            stackView.widthAnchor.constraint(equalToConstant: width).isActive = true
+            let widthConstraint = stackView.widthAnchor.constraint(equalToConstant: width)
+            widthConstraint.isActive = true
+            widthConstraint.priority = .defaultHigh
         } else {
             let stubView = UIView()
             stubView.backgroundColor = .clear
