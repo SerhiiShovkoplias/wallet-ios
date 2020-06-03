@@ -1,4 +1,4 @@
-//  ConfirmPhraseViewController.swift
+//  VerifyPhraseViewController.swift
 
 /*
 	Package MobileWallet
@@ -40,16 +40,17 @@
 
 import UIKit
 
-class ConfirmPhraseViewController: SettingsParentViewController {
+class VerifyPhraseViewController: SettingsParentViewController {
     private let continueButton = ActionButton()
     private let headerLabel = UILabel()
-    private var phraseView: RecoveryPhraseView?
+    private var selectablePhraseView: WordsFlexView!
 
-    private let confirmPhraseContainer = UIView()
-    private var confirmRecoveryPhraseView: RecoveryPhraseView?
+    private let fillablePhraseContainer = UIView()
+    private var fillablePhraseView: WordsFlexView!
+    private let fillableContainerDescription = UILabel()
 }
 
-extension ConfirmPhraseViewController {
+extension VerifyPhraseViewController {
     override func setupViews() {
         super.setupViews()
         setupHeaderLabel()
@@ -76,19 +77,19 @@ extension ConfirmPhraseViewController {
     }
 
     private func setupVerificationView() {
-        confirmPhraseContainer.backgroundColor = Theme.shared.colors.settingsVerificationPhraseView
-        confirmPhraseContainer.layer.cornerRadius = 10.0
-        confirmPhraseContainer.layer.masksToBounds = true
+        fillablePhraseContainer.backgroundColor = Theme.shared.colors.settingsVerificationPhraseView
+        fillablePhraseContainer.layer.cornerRadius = 10.0
+        fillablePhraseContainer.layer.masksToBounds = true
 
-        view.addSubview(confirmPhraseContainer)
+        view.addSubview(fillablePhraseContainer)
 
-        confirmPhraseContainer.translatesAutoresizingMaskIntoConstraints = false
-        confirmPhraseContainer.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 20).isActive = true
-        confirmPhraseContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
-        confirmPhraseContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
-        confirmPhraseContainer.heightAnchor.constraint(greaterThanOrEqualToConstant: 50).isActive = true
+        fillablePhraseContainer.translatesAutoresizingMaskIntoConstraints = false
+        fillablePhraseContainer.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 20).isActive = true
+        fillablePhraseContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
+        fillablePhraseContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
+        fillablePhraseContainer.heightAnchor.constraint(greaterThanOrEqualToConstant: 188).isActive = true
 
-        confirmRecoveryPhraseView = RecoveryPhraseView(type: .fillable,
+        fillablePhraseView = WordsFlexView(type: .fillable,
                                                        minimumHeight: 17.0,
                                                        maxCountInRaw: 5,
                                                        horizontalSpacing: 20.0,
@@ -96,28 +97,42 @@ extension ConfirmPhraseViewController {
                                                        minimumInsets: UIEdgeInsets(top: 3.0, left: 1.0, bottom: 3.0, right: 1.0),
                                                        showBorder: false)
 
-        confirmRecoveryPhraseView?.delegate = self
-        confirmPhraseContainer.addSubview(confirmRecoveryPhraseView!)
+        fillablePhraseView.delegate = self
+        fillablePhraseContainer.addSubview(fillablePhraseView!)
 
-        confirmRecoveryPhraseView!.translatesAutoresizingMaskIntoConstraints = false
-        confirmRecoveryPhraseView!.topAnchor.constraint(equalTo: confirmPhraseContainer.topAnchor, constant: 20).isActive = true
-        confirmRecoveryPhraseView!.leadingAnchor.constraint(equalTo: confirmPhraseContainer.leadingAnchor, constant: 20).isActive = true
-        confirmRecoveryPhraseView!.trailingAnchor.constraint(equalTo: confirmPhraseContainer.trailingAnchor, constant: -20).isActive = true
-        confirmRecoveryPhraseView!.bottomAnchor.constraint(lessThanOrEqualTo: confirmPhraseContainer.bottomAnchor, constant: -20).isActive = true
+        fillablePhraseView.translatesAutoresizingMaskIntoConstraints = false
+        fillablePhraseView.topAnchor.constraint(equalTo: fillablePhraseContainer.topAnchor, constant: 20).isActive = true
+        fillablePhraseView.leadingAnchor.constraint(equalTo: fillablePhraseContainer.leadingAnchor, constant: 20).isActive = true
+        fillablePhraseView.trailingAnchor.constraint(equalTo: fillablePhraseContainer.trailingAnchor, constant: -20).isActive = true
+        fillablePhraseView.bottomAnchor.constraint(lessThanOrEqualTo: fillablePhraseContainer.bottomAnchor, constant: -20).isActive = true
+
+        fillableContainerDescription.text = NSLocalizedString("Tap on the words above in the correct order", comment: "Fillable phrase container description")
+        fillableContainerDescription.font = Theme.shared.fonts.settingsFillablePhraseViewDescription
+        fillableContainerDescription.textColor = Theme.shared.colors.settingsFillablePhraseViewDescription
+        fillableContainerDescription.textAlignment = .center
+
+        fillablePhraseContainer.addSubview(fillableContainerDescription)
+
+        fillableContainerDescription.translatesAutoresizingMaskIntoConstraints = false
+        fillableContainerDescription.centerYAnchor.constraint(equalTo: fillablePhraseContainer.centerYAnchor).isActive = true
+        fillableContainerDescription.centerXAnchor.constraint(equalTo: fillablePhraseContainer.centerXAnchor).isActive = true
+        fillableContainerDescription.leadingAnchor.constraint(greaterThanOrEqualTo: fillablePhraseContainer.leadingAnchor, constant: 20).isActive = true
+        fillableContainerDescription.trailingAnchor.constraint(lessThanOrEqualTo: fillablePhraseContainer.trailingAnchor, constant: -20).isActive = true
+
     }
 
     private func setupPhraseView() {
-        let words = ["Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo", "Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo", "Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo", "Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo"]
+        let words = ["Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo", "Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo", "Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo"]
 
-        phraseView = RecoveryPhraseView(type: .selectable, words: words, width: (view.bounds.width - 50))
-        phraseView?.delegate = self
+        selectablePhraseView = WordsFlexView(type: .selectable, words: words, width: (view.bounds.width - 50))
+        selectablePhraseView?.delegate = self
 
-        view.addSubview(phraseView!)
+        view.addSubview(selectablePhraseView)
 
-        phraseView!.translatesAutoresizingMaskIntoConstraints = false
-        phraseView!.topAnchor.constraint(equalTo: confirmPhraseContainer.bottomAnchor, constant: 25).isActive = true
-        phraseView!.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
-        phraseView!.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
+        selectablePhraseView.translatesAutoresizingMaskIntoConstraints = false
+        selectablePhraseView.topAnchor.constraint(equalTo: fillablePhraseContainer.bottomAnchor, constant: 25).isActive = true
+        selectablePhraseView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
+        selectablePhraseView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
     }
 
     private func setupContinueButton() {
@@ -147,12 +162,16 @@ extension ConfirmPhraseViewController {
     }
 }
 
-extension ConfirmPhraseViewController: RecoveryPhraseViewDelegate {
-    func didSelectWord(word: String, intId: Int, phraseView: RecoveryPhraseView) {
+extension VerifyPhraseViewController: WordsFlexViewDelegate {
+    func didSelectWord(word: String, intId: Int, phraseView: WordsFlexView) {
         switch phraseView.type {
-        case .fillable: self.phraseView?.restore(word: word, intId: intId)
+        case .fillable: self.selectablePhraseView?.restore(word: word, intId: intId)
 
-        case .selectable: confirmRecoveryPhraseView?.addWord(word, intId: intId)
+        case .selectable: fillablePhraseView?.addWord(word, intId: intId)
+        }
+
+        UIView.animate(withDuration: CATransaction.animationDuration()) {
+            self.fillableContainerDescription.alpha = self.fillablePhraseView.words.isEmpty ? 1.0 : 0.0
         }
     }
 }

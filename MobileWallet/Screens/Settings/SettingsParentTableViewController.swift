@@ -47,7 +47,7 @@ class SettingsParentTableViewController: SettingsParentViewController {
 extension SettingsParentTableViewController {
     override func setupViews() {
         super.setupViews()
-        view.backgroundColor = Theme.shared.colors.restoreWalletBackground
+        view.backgroundColor = Theme.shared.colors.settingsTableStyleBackground
         setupTableView()
     }
 
@@ -55,7 +55,7 @@ extension SettingsParentTableViewController {
         tableView.register(AppTableViewCell.self, forCellReuseIdentifier: String(describing: AppTableViewCell.self))
         tableView.backgroundColor = .clear
         tableView.showsVerticalScrollIndicator = false
-        tableView.separatorColor = Theme.shared.colors.restoreWalletBackground
+        tableView.separatorColor = Theme.shared.colors.settingsTableStyleBackground
 
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false

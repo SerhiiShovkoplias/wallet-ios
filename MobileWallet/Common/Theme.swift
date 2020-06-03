@@ -99,9 +99,6 @@ struct Colors: Loopable {
     let tapToSeeFullEmoji = UIColor(named: "CreatingWalletTapToSeeFullEmoji")
     let tapToSeeFullEmojiBackground = UIColor(named: "CreatingWalletTapToSeeFullEmojiIDBackground")
 
-    //RestoreWallet
-    let restoreWalletBackground = UIColor(named: "RestoreWalletBackground")
-
     // Profile
     let profileTitleTextColor = UIColor(named: "ProfileTitleTextBlack")
     let profileMiddleLabel = UIColor(named: "ProfileMiddleLabel")
@@ -109,12 +106,14 @@ struct Colors: Loopable {
     let profileBackground = UIColor(named: "ProfileBackground")
 
     // Settings
+    let settingsTableStyleBackground = UIColor(named: "SettingsTableStyleBackground")
     let settingsDoneButtonTitle = UIColor(named: "SettingsDoneButtonTitle")
     let settingsNavBarSeparator = UIColor(named: "SettingsNavBarSeparator")
     let settingsBackupWalletDescription = UIColor(named: "SettingsBackupWalletDescription")
     let settingsRecoveryPhraseWorldText = UIColor(named: "SettingsRecoveryPhraseWorldText")
     let settingsRecoveryPhraseWorldBorder = UIColor(named: "SettingsRecoveryPhraseWorldBorder")
     let settingsVerificationPhraseView = UIColor(named: "SettingsVerificationPhraseView")
+    let settingsFillablePhraseViewDescription = UIColor(named: "SettingsFillablePhraseViewDescription")
 
     //Home screen
     let homeScreenBackground = UIColor(named: "HomeScreenBackground")
@@ -247,6 +246,7 @@ struct Fonts: Loopable {
     let settingsTableViewHeader = UIFont(name: "Avenir-Black", size: 17)
     let settingsBackupWalletDescription = UIFont(name: "Avenir-Medium", size: 14)
     let settingsRecoveryPhraseWorld = UIFont(name: "Avenir-Heavy", size: 14)
+    let settingsFillablePhraseViewDescription = UIFont(name: "Avenir-Medium", size: 12)
 
     //Home screen
     let homeScreenTotalBalanceLabel = UIFont(name: "Avenir-Roman", size: 14.0)
