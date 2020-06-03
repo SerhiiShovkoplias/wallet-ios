@@ -78,6 +78,9 @@ struct TariSettings {
 
     let faucetServer = "https://faucet.tari.com"
 
+    let tariUrl = "https://www.tari.com/"
+    let contributeUrl = "https://www.github.com/tari-project"
+    let disclaimer = "https://www.tari.com/disclaimer"
     let userAgreementUrl = "https://www.tari.com/user_agreement/"
     let privacyPolicyUrl = "https://www.tari.com/privacy_policy/"
     let storeUrl = "https://store.tarilabs.com/"

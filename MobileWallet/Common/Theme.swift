@@ -83,6 +83,7 @@ struct Colors: Loopable {
     let appBackground = UIColor(named: "AppBackground")
 
     let inputPlaceholder = UIColor(named: "Placeholder")
+    let appTableViewCellBackground = UIColor(named: "AppTableViewCellBackground")
 
     // Splash
     let splashTitle = UIColor(named: "SplashTitle")
@@ -98,12 +99,22 @@ struct Colors: Loopable {
     let tapToSeeFullEmoji = UIColor(named: "CreatingWalletTapToSeeFullEmoji")
     let tapToSeeFullEmojiBackground = UIColor(named: "CreatingWalletTapToSeeFullEmojiIDBackground")
 
+    //RestoreWallet
+    let restoreWalletBackground = UIColor(named: "RestoreWalletBackground")
+
     // Profile
     let profileTitleTextColor = UIColor(named: "ProfileTitleTextBlack")
-    let profileSeparatorView = UIColor(named: "ProfileSeparatorView")
     let profileMiddleLabel = UIColor(named: "ProfileMiddleLabel")
     let profileQRShadow = UIColor(named: "ProfileQRShadow")
     let profileBackground = UIColor(named: "ProfileBackground")
+
+    // Settings
+    let settingsDoneButtonTitle = UIColor(named: "SettingsDoneButtonTitle")
+    let settingsNavBarSeparator = UIColor(named: "SettingsNavBarSeparator")
+    let settingsBackupWalletDescription = UIColor(named: "SettingsBackupWalletDescription")
+    let settingsRecoveryPhraseWorldText = UIColor(named: "SettingsRecoveryPhraseWorldText")
+    let settingsRecoveryPhraseWorldBorder = UIColor(named: "SettingsRecoveryPhraseWorldBorder")
+    let settingsVerificationPhraseView = UIColor(named: "SettingsVerificationPhraseView")
 
     //Home screen
     let homeScreenBackground = UIColor(named: "HomeScreenBackground")
@@ -224,12 +235,18 @@ struct Fonts: Loopable {
     let createWalletNotificationsSecondLabel = UIFont(name: "Avenir-Black", size: 18.0)
     let createWalletNotificationsThirdLabel = UIFont(name: "Avenir-Medium", size: 14.0)
     let tapToSeeFullEmojiLabel = UIFont(name: "Avenir-Heavy", size: 12)
+    let restoreWalletButton = UIFont(name: "Avenir-Medium", size: 13.0)
 
     //Profile
     let profileTitleLightLabel = UIFont(name: "Avenir-Light", size: 18.0)
     let profileTitleRegularLabel = UIFont(name: "Avenir-Black", size: 18.0)
-    let profileCopyEmojiButton = UIFont(name: "Avenir-Medium", size: 12)
     let profileMiddleLabel = UIFont(name: "Avenir-Medium", size: 14)
+
+    //Settings
+    let settingsDoneButton = UIFont(name: "Avenir-Medium", size: 16)
+    let settingsTableViewHeader = UIFont(name: "Avenir-Black", size: 17)
+    let settingsBackupWalletDescription = UIFont(name: "Avenir-Medium", size: 14)
+    let settingsRecoveryPhraseWorld = UIFont(name: "Avenir-Heavy", size: 14)
 
     //Home screen
     let homeScreenTotalBalanceLabel = UIFont(name: "Avenir-Roman", size: 14.0)
@@ -293,6 +310,10 @@ struct Fonts: Loopable {
 
     //Refresh view
     let refreshViewLabel = UIFont(name: "Avenir-Heavy", size: 12.0)
+
+    //App table view
+    let appTableViewCell = UIFont(name: "Avenir-Medium", size: 15)
+
 }
 
 struct Images: Loopable {
@@ -326,9 +347,14 @@ struct Images: Loopable {
     let storeModal = UIImage(named: "store-modal")
     let unknownUser = UIImage(named: "unknownUser")
     let handWave = UIImage(named: "HandWave")
+    let attention = UIImage(named: "Attention")
+    let success = UIImage(named: "Success")
 
     //Amount
     let delete = UIImage(named: "numpad-delete")
+
+    //profile
+    let settings = UIImage(named: "settings")
 }
 
 struct Sizes {
