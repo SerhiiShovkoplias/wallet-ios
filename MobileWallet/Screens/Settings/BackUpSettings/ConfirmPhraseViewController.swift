@@ -148,8 +148,11 @@ extension ConfirmPhraseViewController {
 }
 
 extension ConfirmPhraseViewController: RecoveryPhraseViewDelegate {
-    func didSelectWord(word: String, index: Int, phraseView: RecoveryPhraseView) {
-        if phraseView == confirmRecoveryPhraseView { return }
-        confirmRecoveryPhraseView?.addWords([word])
+    func didSelectWord(word: String, intId: Int, phraseView: RecoveryPhraseView) {
+        switch phraseView.type {
+        case .fillable: self.phraseView?.restore(word: word, intId: intId)
+
+        case .selectable: confirmRecoveryPhraseView?.addWord(word, intId: intId)
+        }
     }
 }
