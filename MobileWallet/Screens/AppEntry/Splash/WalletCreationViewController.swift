@@ -94,6 +94,7 @@ class WalletCreationViewController: UIViewController {
         super.viewDidLoad()
         setupView()
         prepareSubviews(for: .initial)
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
     }
 
     override func viewDidAppear(_ animated: Bool) {

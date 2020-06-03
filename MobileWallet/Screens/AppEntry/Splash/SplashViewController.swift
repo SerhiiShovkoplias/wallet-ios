@@ -57,14 +57,15 @@ class SplashViewController: UIViewController, UITextViewDelegate {
     var alreadyReplacedVideo: Bool = false
 
     // MARK: - Outlets
-    var videoView = UIView()
-    var versionLabel = UILabel()
-    var animationContainer = AnimationView()
-    var elementsContainer = UIView()
-    var createWalletButton = ActionButton()
-    var titleLabel = UILabel()
-    var gemImageView = UIImageView()
-    var disclaimerText = UITextView()
+    let videoView = UIView()
+    let versionLabel = UILabel()
+    let animationContainer = AnimationView()
+    let elementsContainer = UIView()
+    let createWalletButton = ActionButton()
+    let titleLabel = UILabel()
+    let gemImageView = UIImageView()
+    let disclaimerText = UITextView()
+    let restoreButton = UIButton()
 
     var distanceTitleSubtitle = NSLayoutConstraint()
     var animationContainerBottomAnchor: NSLayoutConstraint?
@@ -79,8 +80,12 @@ class SplashViewController: UIViewController, UITextViewDelegate {
         super.viewDidLoad()
         setupView()
         loadAnimation()
-
         handleWalletEvents()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        setupVideoAnimation()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -226,23 +231,25 @@ class SplashViewController: UIViewController, UITextViewDelegate {
             }
 
         } else {
-            //No wallet exists, setup for welcome splash screen
-            setupVideoAnimation()
+            videoView.isHidden = false
             titleLabel.isHidden = false
-            //subtitleLabel.isHidden = false
             createWalletButton.isHidden = false
             disclaimerText.isHidden = false
-
+            restoreButton.isHidden = false
             Tracker.shared.track("/onboarding/introduction", "Onboarding - Introduction")
         }
     }
 
     @objc func onCreateWalletTap() {
         createWalletButton.variation = .loading
-        //TariLib.shared.startTor()
         onTorSuccess {
             self.createNewWallet()
         }
+    }
+
+    @objc func onRestorWalletTap() {
+        let restoreWalletViewController = RestoreWalletViewController()
+        navigationController?.pushViewController(restoreWalletViewController, animated: true)
     }
 
     private func authenticateUser(onSuccess: @escaping () -> Void) {

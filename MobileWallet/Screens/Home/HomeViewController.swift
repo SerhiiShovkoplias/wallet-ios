@@ -382,8 +382,7 @@ class HomeViewController: UIViewController, FloatingPanelControllerDelegate {
 // MARK: - Actions
 extension HomeViewController {
     @objc func onProfileShow(_ sender: Any) {
-        let vc = ProfileViewController()
-        self.present(vc, animated: true, completion: nil)
+        navigationController?.pushViewController(ProfileViewController(), animated: true)
     }
 
     @objc private func onStoreModalShow(_ sender: Any) {
