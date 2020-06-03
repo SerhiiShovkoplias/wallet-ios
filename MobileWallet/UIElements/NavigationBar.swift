@@ -196,7 +196,7 @@ class NavigationBar: UIView, NavigationBarProtocol {
             self?.emoji = nil
         }
     }
-    
+
     @objc public func backAction(_sender: UIButton) {
         if backButtonAction != nil {
             backButtonAction?()

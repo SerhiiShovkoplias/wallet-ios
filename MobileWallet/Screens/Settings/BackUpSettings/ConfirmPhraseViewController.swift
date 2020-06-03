@@ -44,6 +44,8 @@ class ConfirmPhraseViewController: SettingsParentViewController {
     private let continueButton = ActionButton()
     private let headerLabel = UILabel()
     private var phraseView: RecoveryPhraseView?
+
+    private let confirmPhraseContainer = UIView()
     private var confirmRecoveryPhraseView: RecoveryPhraseView?
 }
 
@@ -51,8 +53,8 @@ extension ConfirmPhraseViewController {
     override func setupViews() {
         super.setupViews()
         setupHeaderLabel()
-        setupPhraseView()
         setupVerificationView()
+        setupPhraseView()
         setupContinueButton()
     }
 
@@ -70,7 +72,37 @@ extension ConfirmPhraseViewController {
 
         headerLabel.translatesAutoresizingMaskIntoConstraints = false
         headerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
-        headerLabel.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 35).isActive = true
+        headerLabel.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 20).isActive = true
+    }
+
+    private func setupVerificationView() {
+        confirmPhraseContainer.backgroundColor = Theme.shared.colors.settingsVerificationPhraseView
+        confirmPhraseContainer.layer.cornerRadius = 10.0
+        confirmPhraseContainer.layer.masksToBounds = true
+
+        view.addSubview(confirmPhraseContainer)
+
+        confirmPhraseContainer.translatesAutoresizingMaskIntoConstraints = false
+        confirmPhraseContainer.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 20).isActive = true
+        confirmPhraseContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
+        confirmPhraseContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
+        confirmPhraseContainer.heightAnchor.constraint(greaterThanOrEqualToConstant: 50).isActive = true
+
+        confirmRecoveryPhraseView = RecoveryPhraseView(minimumHeight: 15.0,
+                                                       maxCountInRaw: 5,
+                                                       horizontalSpacing: 20.0,
+                                                       verticalSpacing: 15,
+                                                       minimumInsets: .zero,
+                                                       showBorder: false)
+
+        confirmRecoveryPhraseView?.delegate = self
+        confirmPhraseContainer.addSubview(confirmRecoveryPhraseView!)
+
+        confirmRecoveryPhraseView!.translatesAutoresizingMaskIntoConstraints = false
+        confirmRecoveryPhraseView!.topAnchor.constraint(equalTo: confirmPhraseContainer.topAnchor, constant: 20).isActive = true
+        confirmRecoveryPhraseView!.leadingAnchor.constraint(equalTo: confirmPhraseContainer.leadingAnchor, constant: 20).isActive = true
+        confirmRecoveryPhraseView!.trailingAnchor.constraint(equalTo: confirmPhraseContainer.trailingAnchor, constant: -20).isActive = true
+        confirmRecoveryPhraseView!.bottomAnchor.constraint(lessThanOrEqualTo: confirmPhraseContainer.bottomAnchor, constant: -20).isActive = true
     }
 
     private func setupPhraseView() {
@@ -82,39 +114,9 @@ extension ConfirmPhraseViewController {
         view.addSubview(phraseView!)
 
         phraseView!.translatesAutoresizingMaskIntoConstraints = false
-        phraseView!.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 25).isActive = true
+        phraseView!.topAnchor.constraint(equalTo: confirmPhraseContainer.bottomAnchor, constant: 25).isActive = true
         phraseView!.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
         phraseView!.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
-    }
-
-    private func setupVerificationView() {
-        let phraseContainer = UIView()
-        phraseContainer.backgroundColor = Theme.shared.colors.settingsVerificationPhraseView
-        phraseContainer.layer.cornerRadius = 10.0
-        phraseContainer.layer.masksToBounds = true
-
-        view.addSubview(phraseContainer)
-
-        phraseContainer.translatesAutoresizingMaskIntoConstraints = false
-        phraseContainer.topAnchor.constraint(equalTo: phraseView!.bottomAnchor, constant: 25).isActive = true
-        phraseContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
-        phraseContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
-        phraseContainer.heightAnchor.constraint(equalToConstant: 188).isActive = true
-
-        confirmRecoveryPhraseView = RecoveryPhraseView(minimumHeight: 15.0,
-                                                       maxCountInRaw: 5,
-                                                       horizontalSpacing: 20.0,
-                                                       verticalSpacing: 10,
-                                                       minimumInsets: .zero,
-                                                       showBorder: false)
-
-        confirmRecoveryPhraseView?.delegate = self
-        phraseContainer.addSubview(confirmRecoveryPhraseView!)
-
-        confirmRecoveryPhraseView!.translatesAutoresizingMaskIntoConstraints = false
-        confirmRecoveryPhraseView!.topAnchor.constraint(equalTo: phraseContainer.topAnchor, constant: 20).isActive = true
-        confirmRecoveryPhraseView!.leadingAnchor.constraint(equalTo: phraseContainer.leadingAnchor, constant: 20).isActive = true
-        confirmRecoveryPhraseView!.trailingAnchor.constraint(equalTo: phraseContainer.trailingAnchor, constant: -20).isActive = true
     }
 
     private func setupContinueButton() {
