@@ -358,6 +358,15 @@
 		37AFE265245193CA006EA270 /* AlwaysPoppableNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFE264245193CA006EA270 /* AlwaysPoppableNavigationController.swift */; };
 		37AFE266245193CA006EA270 /* AlwaysPoppableNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFE264245193CA006EA270 /* AlwaysPoppableNavigationController.swift */; };
 		37AFE267245193CA006EA270 /* AlwaysPoppableNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFE264245193CA006EA270 /* AlwaysPoppableNavigationController.swift */; };
+		37B444A9248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
+		37B444AA248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
+		37B444AB248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
+		37B444AE24894C6200592D92 /* checkbox-selectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37B444AC24894C6100592D92 /* checkbox-selectAnimation.json */; };
+		37B444AF24894C6200592D92 /* checkbox-selectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37B444AC24894C6100592D92 /* checkbox-selectAnimation.json */; };
+		37B444B024894C6200592D92 /* checkbox-selectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37B444AC24894C6100592D92 /* checkbox-selectAnimation.json */; };
+		37B444B124894C6200592D92 /* checkbox-deselectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37B444AD24894C6200592D92 /* checkbox-deselectAnimation.json */; };
+		37B444B224894C6200592D92 /* checkbox-deselectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37B444AD24894C6200592D92 /* checkbox-deselectAnimation.json */; };
+		37B444B324894C6200592D92 /* checkbox-deselectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37B444AD24894C6200592D92 /* checkbox-deselectAnimation.json */; };
 		37BB696B245705D20013AC4D /* RadialGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BB696A245705D20013AC4D /* RadialGradientView.swift */; };
 		37BB696C245705E60013AC4D /* RadialGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BB696A245705D20013AC4D /* RadialGradientView.swift */; };
 		37BB696D245705E70013AC4D /* RadialGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BB696A245705D20013AC4D /* RadialGradientView.swift */; };
@@ -683,6 +692,9 @@
 		37ABB68F24781CE800F08163 /* UILabel+InterlineSpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+InterlineSpacing.swift"; sourceTree = "<group>"; };
 		37ABB69324781F8600F08163 /* UILabelWithPadding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILabelWithPadding.swift; sourceTree = "<group>"; };
 		37AFE264245193CA006EA270 /* AlwaysPoppableNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlwaysPoppableNavigationController.swift; sourceTree = "<group>"; };
+		37B444A8248949B800592D92 /* Checkbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checkbox.swift; sourceTree = "<group>"; };
+		37B444AC24894C6100592D92 /* checkbox-selectAnimation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "checkbox-selectAnimation.json"; sourceTree = "<group>"; };
+		37B444AD24894C6200592D92 /* checkbox-deselectAnimation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "checkbox-deselectAnimation.json"; sourceTree = "<group>"; };
 		37BB696A245705D20013AC4D /* RadialGradientView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadialGradientView.swift; sourceTree = "<group>"; };
 		37BB6973245726FB0013AC4D /* CopyableLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CopyableLabel.swift; sourceTree = "<group>"; };
 		37C8BA342480F59B005BBC05 /* WaveEmojiAnimation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = WaveEmojiAnimation.json; sourceTree = "<group>"; };
@@ -1063,6 +1075,7 @@
 		00E2BCAF236B44CE00C2A105 /* UIElements */ = {
 			isa = PBXGroup;
 			children = (
+				37B444A72489436100592D92 /* Checkbox */,
 				371A081624728FCB00F97713 /* TransitionUILabel */,
 				375AFDCD2475380B00C62CA1 /* WebBrowserView */,
 				37BB6969245705D20013AC4D /* RadialGradientView */,
@@ -1267,6 +1280,16 @@
 				37AFE264245193CA006EA270 /* AlwaysPoppableNavigationController.swift */,
 			);
 			path = AlwaysPoppableNavigationController;
+			sourceTree = "<group>";
+		};
+		37B444A72489436100592D92 /* Checkbox */ = {
+			isa = PBXGroup;
+			children = (
+				37B444AD24894C6200592D92 /* checkbox-deselectAnimation.json */,
+				37B444AC24894C6100592D92 /* checkbox-selectAnimation.json */,
+				37B444A8248949B800592D92 /* Checkbox.swift */,
+			);
+			path = Checkbox;
 			sourceTree = "<group>";
 		};
 		37BB6969245705D20013AC4D /* RadialGradientView */ = {
@@ -1632,6 +1655,7 @@
 			files = (
 				00A66517243772A70046E730 /* pendingTx.json in Resources */,
 				BFF1EDA72408226200CC9EF6 /* sending-background.mp4 in Resources */,
+				37B444B124894C6200592D92 /* checkbox-deselectAnimation.json in Resources */,
 				00E491AB2366E08F007B332D /* LaunchScreen.storyboard in Resources */,
 				BF162C01241A510D00647740 /* loader.mp4 in Resources */,
 				BF5537B92412B9BB0071328C /* purple_orb.mp4 in Resources */,
@@ -1639,6 +1663,7 @@
 				BF0A779C241F904D00861A3E /* faceId@3x.png in Resources */,
 				BF191A2923E5AFA200D33C85 /* img_0.png in Resources */,
 				0048AF43245ADCA300E1A359 /* env.json in Resources */,
+				37B444AE24894C6200592D92 /* checkbox-selectAnimation.json in Resources */,
 				00E491A82366E08F007B332D /* Assets.xcassets in Resources */,
 				BF191A1723E5AFA200D33C85 /* img_4.png in Resources */,
 				BF191A3223E70D3200D33C85 /* NerdEmojiAnimation.json in Resources */,
@@ -1676,6 +1701,7 @@
 				00A665202437AD9A0046E730 /* SplashAnimation.json in Resources */,
 				BF0A77A1241F904D00861A3E /* faceId.png in Resources */,
 				00A677982373DA58001A853E /* LaunchScreen.storyboard in Resources */,
+				37B444AF24894C6200592D92 /* checkbox-selectAnimation.json in Resources */,
 				BF0A77A5241F904D00861A3E /* faceId@2x.png in Resources */,
 				BF191A1E23E5AFA200D33C85 /* img_6.png in Resources */,
 				00A66518243772A70046E730 /* pendingTx.json in Resources */,
@@ -1687,6 +1713,7 @@
 				BF162BFD241A42C100647740 /* LoadingButtonAnimation.json in Resources */,
 				BF191A2723E5AFA200D33C85 /* img_3.png in Resources */,
 				BF191A2A23E5AFA200D33C85 /* img_0.png in Resources */,
+				37B444B224894C6200592D92 /* checkbox-deselectAnimation.json in Resources */,
 				BF191A2123E5AFA200D33C85 /* img_1.png in Resources */,
 				BF191A1B23E5AFA200D33C85 /* img_2.png in Resources */,
 				BF191A1823E5AFA200D33C85 /* img_4.png in Resources */,
@@ -1709,6 +1736,7 @@
 				00A665212437AD9A0046E730 /* SplashAnimation.json in Resources */,
 				BF0A77A2241F904D00861A3E /* faceId.png in Resources */,
 				00A677992373DA59001A853E /* LaunchScreen.storyboard in Resources */,
+				37B444B024894C6200592D92 /* checkbox-selectAnimation.json in Resources */,
 				BF0A77A6241F904D00861A3E /* faceId@2x.png in Resources */,
 				BF191A1F23E5AFA200D33C85 /* img_6.png in Resources */,
 				00A66519243772A70046E730 /* pendingTx.json in Resources */,
@@ -1720,6 +1748,7 @@
 				BF162BFE241A42C200647740 /* LoadingButtonAnimation.json in Resources */,
 				BF191A2823E5AFA200D33C85 /* img_3.png in Resources */,
 				BF191A2B23E5AFA200D33C85 /* img_0.png in Resources */,
+				37B444B324894C6200592D92 /* checkbox-deselectAnimation.json in Resources */,
 				BF191A2223E5AFA200D33C85 /* img_1.png in Resources */,
 				BF191A1C23E5AFA200D33C85 /* img_2.png in Resources */,
 				BF191A1923E5AFA200D33C85 /* img_4.png in Resources */,
@@ -2068,6 +2097,7 @@
 				49996E1923F164BA002B6696 /* AnimatedBalanceLabel.swift in Sources */,
 				491AB8A023F3FF4400372189 /* AddAmountViewController.swift in Sources */,
 				00230B0923770CEA00F23E34 /* CALayer.swift in Sources */,
+				37B444A9248949B800592D92 /* Checkbox.swift in Sources */,
 				BFF1ED9D2408111000CC9EF6 /* SendingTariViewController.swift in Sources */,
 				00369D7D24221ACB00BAB95B /* DeepLinkManager.swift in Sources */,
 				001F6CEC2381A39300FA7002 /* CompletedTransaction.swift in Sources */,
@@ -2194,6 +2224,7 @@
 				004277DE23DC2EAB00AE7BD9 /* EmojiButton.swift in Sources */,
 				37C8BA5024813F98005BBC05 /* SettingsParentTableViewController.swift in Sources */,
 				37ABB69124781CE800F08163 /* UILabel+InterlineSpacing.swift in Sources */,
+				37B444AA248949B800592D92 /* Checkbox.swift in Sources */,
 				00BBD813237E9EE200EBF5E6 /* PrivateKey.swift in Sources */,
 				BFF1ED9E2408111000CC9EF6 /* SendingTariViewController.swift in Sources */,
 				37BB6975245726FC0013AC4D /* CopyableLabel.swift in Sources */,
@@ -2215,6 +2246,7 @@
 				001F6CE22380198D00FA7002 /* Contacts.swift in Sources */,
 				37C8BA5124813F98005BBC05 /* SettingsParentTableViewController.swift in Sources */,
 				00BBD810237DA07400EBF5E6 /* ByteVector.swift in Sources */,
+				37B444AB248949B800592D92 /* Checkbox.swift in Sources */,
 				0087A1B123F4235400B89EE7 /* ContactCell.swift in Sources */,
 				004997B92382ED79000A0B7D /* PendingInboundTransactions.swift in Sources */,
 				00C185C62390221A0096984E /* DevelopmentUI.swift in Sources */,

@@ -85,6 +85,8 @@ struct Colors: Loopable {
     let inputPlaceholder = UIColor(named: "Placeholder")
     let appTableViewCellBackground = UIColor(named: "AppTableViewCellBackground")
 
+    let checkBoxBorderColor = UIColor(named: "CheckboxBorderColor")
+
     // Splash
     let splashTitle = UIColor(named: "SplashTitle")
     let splashSubtitle = UIColor(named: "SplashSubtitle")
