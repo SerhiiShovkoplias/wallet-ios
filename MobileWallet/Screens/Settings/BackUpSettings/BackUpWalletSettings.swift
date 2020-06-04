@@ -41,7 +41,6 @@
 import UIKit
 
 class BackUpWalletSettings: SettingsParentTableViewController {
-
     private let items: [AppTableViewCellItem] = [
         AppTableViewCellItem(title: BackUpWalletSettingsItem.backUpToiCloud.localized(), mark: .attention),
         AppTableViewCellItem(title: BackUpWalletSettingsItem.backUpWithRecoveryPhrase.localized(), mark: .attention)]
@@ -65,7 +64,16 @@ class BackUpWalletSettings: SettingsParentTableViewController {
     }
 
     private func onBackUpToiCloudAction() {
+//        let backup = Backup()
 
+//        backup.downloadBackup { (path) in
+//            print(path)
+//        }
+//        do {
+//            try backup.startBackup()
+//        } catch {
+//            print("SHOVQ D throw")
+//        }
     }
 
     private func onBackUpWithRecoveryPhraseAction() {
