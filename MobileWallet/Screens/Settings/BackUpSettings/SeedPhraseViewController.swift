@@ -45,6 +45,8 @@ class SeedPhraseViewController: SettingsParentViewController {
     private let continueButton = ActionButton()
     private var phraseView: WordsFlexView?
 
+    let checkbox = CheckBox()
+
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -54,6 +56,7 @@ extension SeedPhraseViewController {
     override func setupViews() {
         super.setupViews()
         setupHeader()
+        setupCheckbox()
         setupContinueButton()
     }
 
@@ -74,6 +77,16 @@ extension SeedPhraseViewController {
         descriptionLabel.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 25).isActive = true
         descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
         descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
+    }
+
+    private func setupCheckbox() {
+        view.addSubview(checkbox)
+
+        checkbox.translatesAutoresizingMaskIntoConstraints = false
+        checkbox.widthAnchor.constraint(equalToConstant: 25).isActive = true
+        checkbox.heightAnchor.constraint(equalToConstant: 25).isActive = true
+        checkbox.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        checkbox.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
 
     private func setupContinueButton() {

@@ -54,6 +54,9 @@ extension Animation {
         case nerdEmoji = "NerdEmojiAnimation"
 
         case waveEmoji = "WaveEmojiAnimation"
+
+        case checkboxSelectAnimation = "checkbox-selectAnimation"
+        case checkboxDeselectAnimation = "checkbox-deselectAnimation"
     }
 
     static func named(_ animation: LottieAnimation) -> Animation? {
