@@ -91,7 +91,7 @@ class CheckBox: UIButton {
     private func setupAnimationView() {
         addSubview(animationView)
         animationView.isUserInteractionEnabled = false
-        animationView.animationSpeed = 1.4
+        animationView.animationSpeed = 2
 
         animationView.translatesAutoresizingMaskIntoConstraints = false
         animationView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 2.72).isActive = true

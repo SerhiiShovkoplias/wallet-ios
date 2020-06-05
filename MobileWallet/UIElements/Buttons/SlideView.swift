@@ -125,14 +125,14 @@ import UIKit
                 textColor = Theme.shared.colors.actionButtonTitle!
                 thumnailImageView.image = thumnailImageView.image?.withTintColor(Theme.shared.colors.actionButtonBackgroundSimple!)
                 thumnailImageView.layer.shadowOpacity = SlideView.thumbnailShadowRadius
-                ActionButton.applyGradient(sliderHolderView)
+                sliderHolderView.applyGradient()
             } else {
                 sliderBackgroundColor = Theme.shared.colors.actionButtonBackgroundDisabled!
                 //slidingColor = Theme.shared.colors.actionButtonBackgroundDisabled!
                 textColor = Theme.shared.colors.actionButtonTitleDisabled!
                 thumnailImageView.image = thumnailImageView.image?.withTintColor(Theme.shared.colors.actionButtonTitleDisabled!)
                 thumnailImageView.layer.shadowOpacity = 0
-                ActionButton.removeGradient(sliderHolderView)
+                sliderHolderView.removeGradient()
             }
         }
     }

@@ -361,12 +361,6 @@
 		37B444A9248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
 		37B444AA248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
 		37B444AB248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
-		37B444AE24894C6200592D92 /* checkbox-selectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37B444AC24894C6100592D92 /* checkbox-selectAnimation.json */; };
-		37B444AF24894C6200592D92 /* checkbox-selectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37B444AC24894C6100592D92 /* checkbox-selectAnimation.json */; };
-		37B444B024894C6200592D92 /* checkbox-selectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37B444AC24894C6100592D92 /* checkbox-selectAnimation.json */; };
-		37B444B124894C6200592D92 /* checkbox-deselectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37B444AD24894C6200592D92 /* checkbox-deselectAnimation.json */; };
-		37B444B224894C6200592D92 /* checkbox-deselectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37B444AD24894C6200592D92 /* checkbox-deselectAnimation.json */; };
-		37B444B324894C6200592D92 /* checkbox-deselectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37B444AD24894C6200592D92 /* checkbox-deselectAnimation.json */; };
 		37BB696B245705D20013AC4D /* RadialGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BB696A245705D20013AC4D /* RadialGradientView.swift */; };
 		37BB696C245705E60013AC4D /* RadialGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BB696A245705D20013AC4D /* RadialGradientView.swift */; };
 		37BB696D245705E70013AC4D /* RadialGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BB696A245705D20013AC4D /* RadialGradientView.swift */; };
@@ -393,6 +387,8 @@
 		37CB9F8F2451C8CC00C495F2 /* TransactionHistoryContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CB9F8D2451BC6C00C495F2 /* TransactionHistoryContainer.swift */; };
 		37CB9F902451C8CD00C495F2 /* TransactionHistoryContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CB9F8D2451BC6C00C495F2 /* TransactionHistoryContainer.swift */; };
 		37E4B62B24501FB200FA302B /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E4B62A24501FB200FA302B /* HomeViewController.swift */; };
+		37EE027E248A4DCC00E25D69 /* checkbox-deselectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37EE027C248A4DCB00E25D69 /* checkbox-deselectAnimation.json */; };
+		37EE027F248A4DCC00E25D69 /* checkbox-selectAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 37EE027D248A4DCB00E25D69 /* checkbox-selectAnimation.json */; };
 		37EE285A2485649800335EDC /* WordsFlexView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EE28592485649800335EDC /* WordsFlexView.swift */; };
 		37EE285B2485649800335EDC /* WordsFlexView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EE28592485649800335EDC /* WordsFlexView.swift */; };
 		37EE285C2485649800335EDC /* WordsFlexView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EE28592485649800335EDC /* WordsFlexView.swift */; };
@@ -693,8 +689,6 @@
 		37ABB69324781F8600F08163 /* UILabelWithPadding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILabelWithPadding.swift; sourceTree = "<group>"; };
 		37AFE264245193CA006EA270 /* AlwaysPoppableNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlwaysPoppableNavigationController.swift; sourceTree = "<group>"; };
 		37B444A8248949B800592D92 /* Checkbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checkbox.swift; sourceTree = "<group>"; };
-		37B444AC24894C6100592D92 /* checkbox-selectAnimation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "checkbox-selectAnimation.json"; sourceTree = "<group>"; };
-		37B444AD24894C6200592D92 /* checkbox-deselectAnimation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "checkbox-deselectAnimation.json"; sourceTree = "<group>"; };
 		37BB696A245705D20013AC4D /* RadialGradientView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadialGradientView.swift; sourceTree = "<group>"; };
 		37BB6973245726FB0013AC4D /* CopyableLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CopyableLabel.swift; sourceTree = "<group>"; };
 		37C8BA342480F59B005BBC05 /* WaveEmojiAnimation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = WaveEmojiAnimation.json; sourceTree = "<group>"; };
@@ -704,6 +698,8 @@
 		37CB9F892451A2AD00C495F2 /* String+Emoji.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Emoji.swift"; sourceTree = "<group>"; };
 		37CB9F8D2451BC6C00C495F2 /* TransactionHistoryContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHistoryContainer.swift; sourceTree = "<group>"; };
 		37E4B62A24501FB200FA302B /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		37EE027C248A4DCB00E25D69 /* checkbox-deselectAnimation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "checkbox-deselectAnimation.json"; sourceTree = "<group>"; };
+		37EE027D248A4DCB00E25D69 /* checkbox-selectAnimation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "checkbox-selectAnimation.json"; sourceTree = "<group>"; };
 		37EE28592485649800335EDC /* WordsFlexView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsFlexView.swift; sourceTree = "<group>"; };
 		39441F6A326A7475D12D0092 /* Pods_MobileWalletNotificationService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MobileWalletNotificationService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		491AB89F23F3FF4400372189 /* AddAmountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAmountViewController.swift; sourceTree = "<group>"; };
@@ -1285,8 +1281,8 @@
 		37B444A72489436100592D92 /* Checkbox */ = {
 			isa = PBXGroup;
 			children = (
-				37B444AD24894C6200592D92 /* checkbox-deselectAnimation.json */,
-				37B444AC24894C6100592D92 /* checkbox-selectAnimation.json */,
+				37EE027C248A4DCB00E25D69 /* checkbox-deselectAnimation.json */,
+				37EE027D248A4DCB00E25D69 /* checkbox-selectAnimation.json */,
 				37B444A8248949B800592D92 /* Checkbox.swift */,
 			);
 			path = Checkbox;
@@ -1655,7 +1651,6 @@
 			files = (
 				00A66517243772A70046E730 /* pendingTx.json in Resources */,
 				BFF1EDA72408226200CC9EF6 /* sending-background.mp4 in Resources */,
-				37B444B124894C6200592D92 /* checkbox-deselectAnimation.json in Resources */,
 				00E491AB2366E08F007B332D /* LaunchScreen.storyboard in Resources */,
 				BF162C01241A510D00647740 /* loader.mp4 in Resources */,
 				BF5537B92412B9BB0071328C /* purple_orb.mp4 in Resources */,
@@ -1663,13 +1658,13 @@
 				BF0A779C241F904D00861A3E /* faceId@3x.png in Resources */,
 				BF191A2923E5AFA200D33C85 /* img_0.png in Resources */,
 				0048AF43245ADCA300E1A359 /* env.json in Resources */,
-				37B444AE24894C6200592D92 /* checkbox-selectAnimation.json in Resources */,
 				00E491A82366E08F007B332D /* Assets.xcassets in Resources */,
 				BF191A1723E5AFA200D33C85 /* img_4.png in Resources */,
 				BF191A3223E70D3200D33C85 /* NerdEmojiAnimation.json in Resources */,
 				BF0A7766241EEA0A00861A3E /* FaceID.json in Resources */,
 				BF0A77A4241F904D00861A3E /* faceId@2x.png in Resources */,
 				BF191A1D23E5AFA200D33C85 /* img_6.png in Resources */,
+				37EE027F248A4DCC00E25D69 /* checkbox-selectAnimation.json in Resources */,
 				BF0A77A0241F904D00861A3E /* faceId.png in Resources */,
 				37C8BA352480F59B005BBC05 /* WaveEmojiAnimation.json in Resources */,
 				BF0A77C42420DA3200861A3E /* TouchIdAnimation.json in Resources */,
@@ -1679,6 +1674,7 @@
 				BF191A0D23E5A96700D33C85 /* EmojiWheel.json in Resources */,
 				BFF1EDA32408225900CC9EF6 /* sendingTariAnimation.json in Resources */,
 				BF191A1A23E5AFA200D33C85 /* img_2.png in Resources */,
+				37EE027E248A4DCC00E25D69 /* checkbox-deselectAnimation.json in Resources */,
 				BF191A2323E5AFA200D33C85 /* img_5.png in Resources */,
 				BF162BFC241A40E800647740 /* LoadingButtonAnimation.json in Resources */,
 				BF191A2623E5AFA200D33C85 /* img_3.png in Resources */,
@@ -1701,7 +1697,6 @@
 				00A665202437AD9A0046E730 /* SplashAnimation.json in Resources */,
 				BF0A77A1241F904D00861A3E /* faceId.png in Resources */,
 				00A677982373DA58001A853E /* LaunchScreen.storyboard in Resources */,
-				37B444AF24894C6200592D92 /* checkbox-selectAnimation.json in Resources */,
 				BF0A77A5241F904D00861A3E /* faceId@2x.png in Resources */,
 				BF191A1E23E5AFA200D33C85 /* img_6.png in Resources */,
 				00A66518243772A70046E730 /* pendingTx.json in Resources */,
@@ -1713,7 +1708,6 @@
 				BF162BFD241A42C100647740 /* LoadingButtonAnimation.json in Resources */,
 				BF191A2723E5AFA200D33C85 /* img_3.png in Resources */,
 				BF191A2A23E5AFA200D33C85 /* img_0.png in Resources */,
-				37B444B224894C6200592D92 /* checkbox-deselectAnimation.json in Resources */,
 				BF191A2123E5AFA200D33C85 /* img_1.png in Resources */,
 				BF191A1B23E5AFA200D33C85 /* img_2.png in Resources */,
 				BF191A1823E5AFA200D33C85 /* img_4.png in Resources */,
@@ -1736,7 +1730,6 @@
 				00A665212437AD9A0046E730 /* SplashAnimation.json in Resources */,
 				BF0A77A2241F904D00861A3E /* faceId.png in Resources */,
 				00A677992373DA59001A853E /* LaunchScreen.storyboard in Resources */,
-				37B444B024894C6200592D92 /* checkbox-selectAnimation.json in Resources */,
 				BF0A77A6241F904D00861A3E /* faceId@2x.png in Resources */,
 				BF191A1F23E5AFA200D33C85 /* img_6.png in Resources */,
 				00A66519243772A70046E730 /* pendingTx.json in Resources */,
@@ -1748,7 +1741,6 @@
 				BF162BFE241A42C200647740 /* LoadingButtonAnimation.json in Resources */,
 				BF191A2823E5AFA200D33C85 /* img_3.png in Resources */,
 				BF191A2B23E5AFA200D33C85 /* img_0.png in Resources */,
-				37B444B324894C6200592D92 /* checkbox-deselectAnimation.json in Resources */,
 				BF191A2223E5AFA200D33C85 /* img_1.png in Resources */,
 				BF191A1C23E5AFA200D33C85 /* img_2.png in Resources */,
 				BF191A1923E5AFA200D33C85 /* img_4.png in Resources */,

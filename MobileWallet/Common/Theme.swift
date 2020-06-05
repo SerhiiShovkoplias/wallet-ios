@@ -111,7 +111,9 @@ struct Colors: Loopable {
     let settingsTableStyleBackground = UIColor(named: "SettingsTableStyleBackground")
     let settingsDoneButtonTitle = UIColor(named: "SettingsDoneButtonTitle")
     let settingsNavBarSeparator = UIColor(named: "SettingsNavBarSeparator")
-    let settingsBackupWalletDescription = UIColor(named: "SettingsBackupWalletDescription")
+    let settingsSeedPhraseDescription = UIColor(named: "SettingsBackupWalletDescription")
+    let cettingsSeedPhraseCellTitle = UIColor(named: "SettingsSeedPhraseCell")
+    let settingsSeedPhraseAgreement = UIColor(named: "SettingsSeedPhraseAgreement")
     let settingsRecoveryPhraseWorldText = UIColor(named: "SettingsRecoveryPhraseWorldText")
     let settingsRecoveryPhraseWorldBorder = UIColor(named: "SettingsRecoveryPhraseWorldBorder")
     let settingsVerificationPhraseView = UIColor(named: "SettingsVerificationPhraseView")
@@ -246,7 +248,12 @@ struct Fonts: Loopable {
     //Settings
     let settingsDoneButton = UIFont(name: "Avenir-Medium", size: 16)
     let settingsTableViewHeader = UIFont(name: "Avenir-Black", size: 17)
-    let settingsBackupWalletDescription = UIFont(name: "Avenir-Medium", size: 14)
+
+    let settingsSeedPhraseCellTitle = UIFont(name: "Avenir-Heavy", size: 14)
+    let settingsSeedPhraseCellNumber = UIFont(name: "Avenir-Medium", size: 14)
+
+    let settingsSeedPhraseDescription = UIFont(name: "Avenir-Medium", size: 14)
+    let settingsSeedPhraseAgreement = UIFont(name: "Avenir-Medium", size: 12)
     let settingsRecoveryPhraseWorld = UIFont(name: "Avenir-Heavy", size: 14)
     let settingsFillablePhraseViewDescription = UIFont(name: "Avenir-Medium", size: 12)
 

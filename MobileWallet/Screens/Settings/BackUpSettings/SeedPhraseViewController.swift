@@ -43,21 +43,58 @@ import UIKit
 class SeedPhraseViewController: SettingsParentViewController {
     private let descriptionLabel = UILabel()
     private let continueButton = ActionButton()
-    private var phraseView: WordsFlexView?
+    private let agreementContainer = UIView()
 
-    let checkbox = CheckBox()
+    private let phraseContainer = UIView()
+    private var collectionView: UICollectionView?
+    private let fadeOverlayView = FadedOverlayView()
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    private let cellIdentifier = "SeedPharseCell"
+
+    private let words = ["Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo", "Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo", "Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo"]
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        fadeOverlayView.applyFade(Theme.shared.colors.appBackground!, locations: [0.3, 1])
+    }
+}
+
+extension SeedPhraseViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath as IndexPath) as? SeedPhraseCell else { return UICollectionViewCell() }
+        let word = words[indexPath.row]
+        cell.configure(number: "\(indexPath.row + 1)", word: word)
+        return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 24
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        guard let layout = collectionViewLayout as? UICollectionViewFlowLayout else { return .zero }
+        let width = collectionView.bounds.width - layout.sectionInset.left - layout.sectionInset.right - layout.minimumLineSpacing
+        return CGSize(width: width/2, height: 20)
+    }
+
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        isModalInPresentation = true // Disabling dismiss controller with swipe down on scroll view
+    }
+
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        isModalInPresentation = false
     }
 }
 
 extension SeedPhraseViewController {
     override func setupViews() {
         super.setupViews()
+
         setupHeader()
-        setupCheckbox()
         setupContinueButton()
+        setupAgreementContainer()
+        setupPhraseContainer()
+        setupCollectionView()
     }
 
     override func setupNavigationBar() {
@@ -67,9 +104,9 @@ extension SeedPhraseViewController {
 
     private func setupHeader() {
         descriptionLabel.numberOfLines = 0
-        descriptionLabel.font = Theme.shared.fonts.settingsBackupWalletDescription
-        descriptionLabel.textColor = Theme.shared.colors.settingsBackupWalletDescription
-        descriptionLabel.text = NSLocalizedString("Carefully write these 24 words down in order, and keep the paper somewhere secure where others can’t access it.", comment: "RecoveryPhraseViewController header description")
+        descriptionLabel.font = Theme.shared.fonts.settingsSeedPhraseDescription
+        descriptionLabel.textColor = Theme.shared.colors.settingsSeedPhraseDescription
+        descriptionLabel.text = NSLocalizedString("Carefully write these 24 words down in order, and keep the paper somewhere secure where others can’t access it.", comment: "SeedPhraseViewController header description")
 
         view.addSubview(descriptionLabel)
 
@@ -79,19 +116,47 @@ extension SeedPhraseViewController {
         descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
     }
 
-    private func setupCheckbox() {
-        view.addSubview(checkbox)
+    private func setupAgreementContainer() {
+        agreementContainer.backgroundColor = .clear
+
+        view.addSubview(agreementContainer)
+        agreementContainer.translatesAutoresizingMaskIntoConstraints = false
+        agreementContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
+        agreementContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
+        agreementContainer.bottomAnchor.constraint(equalTo: continueButton.topAnchor, constant: -25).isActive = true
+        agreementContainer.heightAnchor.constraint(greaterThanOrEqualToConstant: 25).isActive = true
+
+        let checkbox = CheckBox()
+        checkbox.addTarget(self, action: #selector(checkBoxAction(_:)), for: .touchUpInside)
+        agreementContainer.addSubview(checkbox)
 
         checkbox.translatesAutoresizingMaskIntoConstraints = false
         checkbox.widthAnchor.constraint(equalToConstant: 25).isActive = true
         checkbox.heightAnchor.constraint(equalToConstant: 25).isActive = true
-        checkbox.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        checkbox.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        checkbox.leadingAnchor.constraint(equalTo: agreementContainer.leadingAnchor).isActive = true
+        checkbox.topAnchor.constraint(equalTo: agreementContainer.topAnchor, constant: 3.0).isActive = true
+
+        let agreementLabel = UILabel()
+        agreementLabel.numberOfLines = 0
+        agreementLabel.textAlignment = .left
+
+        agreementContainer.addSubview(agreementLabel)
+
+        agreementLabel.text = NSLocalizedString("I understand that if I lose my recovery seed phrase I will not be able to restore my wallet.", comment: "SeedPhraseViewController agreement")
+        agreementLabel.font = Theme.shared.fonts.settingsSeedPhraseAgreement
+        agreementLabel.textColor = Theme.shared.colors.settingsSeedPhraseAgreement!
+
+        agreementLabel.translatesAutoresizingMaskIntoConstraints = false
+        agreementLabel.leadingAnchor.constraint(equalTo: checkbox.trailingAnchor, constant: 18.0).isActive = true
+        agreementLabel.topAnchor.constraint(equalTo: agreementContainer.topAnchor).isActive = true
+        agreementLabel.bottomAnchor.constraint(equalTo: agreementContainer.bottomAnchor).isActive = true
+        agreementLabel.trailingAnchor.constraint(equalTo: agreementContainer.trailingAnchor).isActive = true
     }
 
     private func setupContinueButton() {
         continueButton.setTitle(NSLocalizedString("Verify Seed Phrase", comment: "Recovery phrase continue button"), for: .normal)
         continueButton.addTarget(self, action: #selector(continueButtonAction), for: .touchUpInside)
+        continueButton.variation = .disabled
         view.addSubview(continueButton)
         continueButton.translatesAutoresizingMaskIntoConstraints = false
 
@@ -111,7 +176,97 @@ extension SeedPhraseViewController {
         continueButtonSecondConstraint.isActive = true
     }
 
+    private func setupPhraseContainer() {
+        phraseContainer.backgroundColor = Theme.shared.colors.settingsVerificationPhraseView
+        phraseContainer.layer.cornerRadius = 10.0
+        phraseContainer.layer.masksToBounds = true
+
+        view.addSubview(phraseContainer)
+
+        phraseContainer.translatesAutoresizingMaskIntoConstraints = false
+        phraseContainer.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 20).isActive = true
+        phraseContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
+        phraseContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
+        phraseContainer.bottomAnchor.constraint(equalTo: agreementContainer.topAnchor, constant: -20).isActive = true
+
+        phraseContainer.addSubview(fadeOverlayView)
+        fadeOverlayView.isUserInteractionEnabled = false
+        fadeOverlayView.translatesAutoresizingMaskIntoConstraints = false
+
+        fadeOverlayView.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        fadeOverlayView.leadingAnchor.constraint(equalTo: phraseContainer.leadingAnchor).isActive = true
+        fadeOverlayView.trailingAnchor.constraint(equalTo: phraseContainer.trailingAnchor).isActive = true
+        fadeOverlayView.bottomAnchor.constraint(equalTo: phraseContainer.bottomAnchor).isActive = true
+    }
+
+    private func setupCollectionView() {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 25
+        layout.minimumInteritemSpacing = 25
+        layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+
+        collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
+        collectionView?.delegate = self
+        collectionView?.dataSource = self
+
+        collectionView?.register(SeedPhraseCell.self, forCellWithReuseIdentifier: cellIdentifier)
+        collectionView?.backgroundColor = .clear
+
+        phraseContainer.insertSubview(collectionView!, belowSubview: fadeOverlayView)
+
+        collectionView?.translatesAutoresizingMaskIntoConstraints = false
+        collectionView?.leadingAnchor.constraint(equalTo: phraseContainer.leadingAnchor).isActive = true
+        collectionView?.trailingAnchor.constraint(equalTo: phraseContainer.trailingAnchor).isActive = true
+        collectionView?.bottomAnchor.constraint(equalTo: phraseContainer.bottomAnchor).isActive = true
+        collectionView?.topAnchor.constraint(equalTo: phraseContainer.topAnchor).isActive = true
+    }
+
+    @objc private func checkBoxAction(_ sender: CheckBox) {
+        continueButton.variation = sender.isChecked ? .normal : .disabled
+    }
+
     @objc private func continueButtonAction() {
         navigationController?.pushViewController(VerifyPhraseViewController(), animated: true)
+    }
+}
+
+private class SeedPhraseCell: UICollectionViewCell {
+    private let numberLabel = UILabel()
+    private let titleLabel = UILabel()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupLabels()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func configure(number: String, word: String) {
+        numberLabel.text = number
+        titleLabel.text = word
+    }
+
+    private func setupLabels() {
+        numberLabel.font = Theme.shared.fonts.settingsSeedPhraseCellNumber
+        numberLabel.textColor = Theme.shared.colors.cettingsSeedPhraseCellTitle?.withAlphaComponent(0.5)
+
+        contentView.addSubview(numberLabel)
+        numberLabel.translatesAutoresizingMaskIntoConstraints = false
+        numberLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        numberLabel.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        numberLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+
+        titleLabel.font = Theme.shared.fonts.settingsSeedPhraseCellTitle
+        titleLabel.textColor = Theme.shared.colors.cettingsSeedPhraseCellTitle
+
+        contentView.addSubview(titleLabel)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.leadingAnchor.constraint(equalTo: numberLabel.trailingAnchor, constant: 10).isActive = true
+        titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
     }
 }
