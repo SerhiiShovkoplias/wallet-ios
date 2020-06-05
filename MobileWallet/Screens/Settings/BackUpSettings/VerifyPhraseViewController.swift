@@ -41,6 +41,8 @@
 import UIKit
 
 class VerifyPhraseViewController: SettingsParentViewController {
+    private let stackView = UIStackView()
+
     private let continueButton = ActionButton()
     private let headerLabel = UILabel()
     private var selectablePhraseView: WordsFlexView!
@@ -53,10 +55,11 @@ class VerifyPhraseViewController: SettingsParentViewController {
 extension VerifyPhraseViewController {
     override func setupViews() {
         super.setupViews()
+        setupContinueButton()
+        setupScrollView()
         setupHeaderLabel()
         setupVerificationView()
         setupPhraseView()
-        setupContinueButton()
     }
 
     override func setupNavigationBar() {
@@ -64,16 +67,39 @@ extension VerifyPhraseViewController {
         navigationBar.title = NSLocalizedString("Verify Seed Phrase", comment: "ConfirmPhraseViewController title")
     }
 
+    private func setupScrollView() {
+        let scrollView = UIScrollView()
+        scrollView.delegate = self
+        scrollView.showsVerticalScrollIndicator = false
+
+        scrollView.backgroundColor = .clear
+        view.addSubview(scrollView)
+
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: continueButton.topAnchor).isActive = true
+        scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+
+        stackView.axis = .vertical
+        stackView.distribution = .fill
+
+        scrollView.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+
+        stackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 20).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -20).isActive = true
+        stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
+    }
+
     private func setupHeaderLabel() {
         headerLabel.font = Theme.shared.fonts.settingsSeedPhraseDescription
         headerLabel.textColor = Theme.shared.colors.settingsSeedPhraseDescription
         headerLabel.text = NSLocalizedString("Select the words in the correct order.", comment: "ConfirmPhraseViewController header title")
 
-        view.addSubview(headerLabel)
-
-        headerLabel.translatesAutoresizingMaskIntoConstraints = false
-        headerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
-        headerLabel.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 20).isActive = true
+        stackView.addArrangedSubview(headerLabel)
+        stackView.setCustomSpacing(20, after: headerLabel)
     }
 
     private func setupVerificationView() {
@@ -81,21 +107,20 @@ extension VerifyPhraseViewController {
         fillablePhraseContainer.layer.cornerRadius = 10.0
         fillablePhraseContainer.layer.masksToBounds = true
 
-        view.addSubview(fillablePhraseContainer)
+        stackView.addArrangedSubview(fillablePhraseContainer)
+        stackView.setCustomSpacing(25, after: fillablePhraseContainer)
 
         fillablePhraseContainer.translatesAutoresizingMaskIntoConstraints = false
-        fillablePhraseContainer.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 20).isActive = true
-        fillablePhraseContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
-        fillablePhraseContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
+        fillablePhraseContainer.widthAnchor.constraint(equalTo: stackView.widthAnchor).isActive = true
         fillablePhraseContainer.heightAnchor.constraint(greaterThanOrEqualToConstant: 188).isActive = true
 
         fillablePhraseView = WordsFlexView(type: .fillable,
-                                                       minimumHeight: 17.0,
-                                                       maxCountInRaw: 5,
-                                                       horizontalSpacing: 20.0,
-                                                       verticalSpacing: 10,
-                                                       minimumInsets: UIEdgeInsets(top: 3.0, left: 1.0, bottom: 3.0, right: 1.0),
-                                                       showBorder: false)
+                                           minimumHeight: 17.0,
+                                           maxCountInRaw: 5,
+                                           horizontalSpacing: 20.0,
+                                           verticalSpacing: 10,
+                                           minimumInsets: UIEdgeInsets(top: 3.0, left: 1.0, bottom: 3.0, right: 1.0),
+                                           showBorder: false)
 
         fillablePhraseView.delegate = self
         fillablePhraseContainer.addSubview(fillablePhraseView!)
@@ -128,12 +153,10 @@ extension VerifyPhraseViewController {
         selectablePhraseView = WordsFlexView(type: .selectable, words: words, width: (view.bounds.width - 50))
         selectablePhraseView?.delegate = self
 
-        view.addSubview(selectablePhraseView)
+        stackView.addArrangedSubview(selectablePhraseView)
 
         selectablePhraseView.translatesAutoresizingMaskIntoConstraints = false
-        selectablePhraseView.topAnchor.constraint(equalTo: fillablePhraseContainer.bottomAnchor, constant: 25).isActive = true
-        selectablePhraseView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25).isActive = true
-        selectablePhraseView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25).isActive = true
+        selectablePhraseView.widthAnchor.constraint(equalTo: stackView.widthAnchor).isActive = true
     }
 
     private func setupContinueButton() {
@@ -174,5 +197,15 @@ extension VerifyPhraseViewController: WordsFlexViewDelegate {
         UIView.animate(withDuration: CATransaction.animationDuration()) {
             self.fillableContainerDescription.alpha = self.fillablePhraseView.words.isEmpty ? 1.0 : 0.0
         }
+    }
+}
+
+extension VerifyPhraseViewController: UIScrollViewDelegate {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        isModalInPresentation = true // Disabling dismiss controller with swipe down on scroll view
+    }
+
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        isModalInPresentation = false
     }
 }
