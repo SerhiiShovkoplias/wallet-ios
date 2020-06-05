@@ -107,8 +107,8 @@ extension BackUpWalletSettings: UITableViewDelegate, UITableViewDataSource {
 
         let desctiptionLabel = UILabel()
         desctiptionLabel.numberOfLines = 0
-        desctiptionLabel.font = Theme.shared.fonts.settingsBackupWalletDescription
-        desctiptionLabel.textColor = Theme.shared.colors.settingsBackupWalletDescription
+        desctiptionLabel.font = Theme.shared.fonts.settingsSeedPhraseDescription
+        desctiptionLabel.textColor = Theme.shared.colors.settingsSeedPhraseDescription
         desctiptionLabel.text = NSLocalizedString("By backing up your wallet, you’ll ensure that you don’t lose your tXTR if your phone is lost or broken.", comment: "Back Up Waallet header description")
 
         header.addSubview(desctiptionLabel)

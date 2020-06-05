@@ -203,9 +203,9 @@ extension WordsFlexView {
         var width: CGFloat = 0
 
         subStackViews.last?.subviews.forEach({
-            if $0 is UIButton {
+            if let button = $0 as? UIButton {
                 buttonsCount += 1
-                width += $0.bounds.width
+                width += (button.titleLabel?.intrinsicContentSize.width ?? 0.0) + minimumInsets.left + minimumInsets.right
             }
         })
 
@@ -297,30 +297,9 @@ extension WordsFlexView {
         stackView.distribution = .equalSpacing
         stackView.spacing = horizontalSpacing
 
-        var width: CGFloat = 0.0
-
         views.forEach {
-            guard let button = $0 as? UIButton else { return }
-            let buttonWidth = (button.titleLabel?.intrinsicContentSize.width ?? 0.0) + minimumInsets.left + minimumInsets.right
-            width += buttonWidth
-            stackView.addArrangedSubview(button)
+            stackView.addArrangedSubview($0)
         }
-
-        width += CGFloat(views.count - 1) * horizontalSpacing
-
-        if views.count == maxCountInRaw {
-            let widthConstraint = stackView.widthAnchor.constraint(equalToConstant: width)
-            widthConstraint.isActive = true
-            widthConstraint.priority = .defaultHigh
-        } else {
-            let stubView = UIView()
-            stubView.backgroundColor = .clear
-            let widthConstraint = stubView.widthAnchor.constraint(equalToConstant: intrinsicWidth - width)
-            widthConstraint.isActive = true
-            widthConstraint.priority = .defaultLow
-            stackView.addArrangedSubview(stubView)
-        }
-
         return stackView
     }
 

@@ -65,8 +65,8 @@ extension VerifyPhraseViewController {
     }
 
     private func setupHeaderLabel() {
-        headerLabel.font = Theme.shared.fonts.settingsBackupWalletDescription
-        headerLabel.textColor = Theme.shared.colors.settingsBackupWalletDescription
+        headerLabel.font = Theme.shared.fonts.settingsSeedPhraseDescription
+        headerLabel.textColor = Theme.shared.colors.settingsSeedPhraseDescription
         headerLabel.text = NSLocalizedString("Select the words in the correct order.", comment: "ConfirmPhraseViewController header title")
 
         view.addSubview(headerLabel)
@@ -106,6 +106,7 @@ extension VerifyPhraseViewController {
         fillablePhraseView.trailingAnchor.constraint(equalTo: fillablePhraseContainer.trailingAnchor, constant: -20).isActive = true
         fillablePhraseView.bottomAnchor.constraint(lessThanOrEqualTo: fillablePhraseContainer.bottomAnchor, constant: -20).isActive = true
 
+        fillableContainerDescription.numberOfLines = 0
         fillableContainerDescription.text = NSLocalizedString("Tap on the words above in the correct order", comment: "Fillable phrase container description")
         fillableContainerDescription.font = Theme.shared.fonts.settingsFillablePhraseViewDescription
         fillableContainerDescription.textColor = Theme.shared.colors.settingsFillablePhraseViewDescription
