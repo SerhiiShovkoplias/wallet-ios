@@ -186,11 +186,6 @@ class SplashViewController: UIViewController, UITextViewDelegate {
                     guard let self = self else { return }
                     self.navigateToHome()
                 }
-            } else {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    self.navigateToHome()
-                }
             }
         } catch {
             UserFeedback.shared.error(
@@ -237,8 +232,11 @@ class SplashViewController: UIViewController, UITextViewDelegate {
     }
 
     @objc func onRestorWalletTap() {
-        let restoreWalletViewController = RestoreWalletViewController()
-        navigationController?.pushViewController(restoreWalletViewController, animated: true)
+        authenticateUser { [weak self] in
+            let restoreWalletViewController = RestoreWalletViewController()
+            self?.navigationController?.pushViewController(restoreWalletViewController, animated: true)
+        }
+
     }
 
     private func authenticateUser(onSuccess: @escaping () -> Void) {
@@ -258,17 +256,7 @@ class SplashViewController: UIViewController, UITextViewDelegate {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     if success {
-                        if let _ = self.ticketTopLayoutConstraint {
-                            self.topAnimationAndRemoveVideoAnimation { [weak self] () in
-                                guard let _ = self else { return }
-                                onSuccess()
-                            }
-                        } else {
-                            DispatchQueue.main.async { [weak self] in
-                                guard let _ = self else { return }
-                                onSuccess()
-                            }
-                        }
+                        onSuccess()
                     } else {
                         let reason = error?.localizedDescription ?? NSLocalizedString("Failed to authenticate", comment: "Failed Face/Touch ID alert")
                         TariLogger.error("Biometrics auth failed", error: error)
