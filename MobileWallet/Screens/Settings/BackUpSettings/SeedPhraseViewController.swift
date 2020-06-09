@@ -177,7 +177,7 @@ extension SeedPhraseViewController {
     }
 
     private func setupPhraseContainer() {
-        phraseContainer.backgroundColor = Theme.shared.colors.settingsVerificationPhraseView
+        phraseContainer.backgroundColor = Theme.shared.colors.settingsVerificationPhraseViewBackground
         phraseContainer.layer.cornerRadius = 10.0
         phraseContainer.layer.masksToBounds = true
 
