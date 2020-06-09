@@ -103,7 +103,7 @@ extension VerifyPhraseViewController {
     }
 
     private func setupVerificationView() {
-        fillablePhraseContainer.backgroundColor = Theme.shared.colors.settingsVerificationPhraseView
+        fillablePhraseContainer.backgroundColor = Theme.shared.colors.settingsVerificationPhraseViewBackground
         fillablePhraseContainer.layer.cornerRadius = 10.0
         fillablePhraseContainer.layer.masksToBounds = true
 

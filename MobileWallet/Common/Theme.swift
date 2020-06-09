@@ -116,7 +116,7 @@ struct Colors: Loopable {
     let settingsSeedPhraseAgreement = UIColor(named: "SettingsSeedPhraseAgreement")
     let settingsRecoveryPhraseWorldText = UIColor(named: "SettingsRecoveryPhraseWorldText")
     let settingsRecoveryPhraseWorldBorder = UIColor(named: "SettingsRecoveryPhraseWorldBorder")
-    let settingsVerificationPhraseView = UIColor(named: "SettingsVerificationPhraseView")
+    let settingsVerificationPhraseViewBackground = UIColor(named: "SettingsVerificationPhraseViewBackground")
     let settingsFillablePhraseViewDescription = UIColor(named: "SettingsFillablePhraseViewDescription")
 
     //Home screen
