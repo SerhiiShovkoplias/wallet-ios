@@ -50,6 +50,22 @@ class VerifyPhraseViewController: SettingsParentViewController {
     private let fillablePhraseContainer = UIView()
     private var fillablePhraseView: WordsFlexView!
     private let fillableContainerDescription = UILabel()
+
+    private let warningView = UIView()
+    private let successView = UIImageView()
+
+    private var success: Bool = false {
+        didSet {
+            let isFillableContainerFull = selectablePhraseView.words.count == fillablePhraseView.words.count
+
+            warningView.isHidden = !isFillableContainerFull || success
+            successView.isHidden = !isFillableContainerFull || !success
+
+            showResultWithAnimation()
+
+            continueButton.variation = success ? .normal : .disabled
+        }
+    }
 }
 
 extension VerifyPhraseViewController {
@@ -58,8 +74,10 @@ extension VerifyPhraseViewController {
         setupContinueButton()
         setupScrollView()
         setupHeaderLabel()
-        setupVerificationView()
-        setupPhraseView()
+        setupFillableView()
+        setupSelectableView()
+        setupWarningView()
+        setupSuccessView()
     }
 
     override func setupNavigationBar() {
@@ -102,7 +120,7 @@ extension VerifyPhraseViewController {
         stackView.setCustomSpacing(20, after: headerLabel)
     }
 
-    private func setupVerificationView() {
+    private func setupFillableView() {
         fillablePhraseContainer.backgroundColor = Theme.shared.colors.settingsVerificationPhraseViewBackground
         fillablePhraseContainer.layer.cornerRadius = 10.0
         fillablePhraseContainer.layer.masksToBounds = true
@@ -147,10 +165,10 @@ extension VerifyPhraseViewController {
 
     }
 
-    private func setupPhraseView() {
+    private func setupSelectableView() {
         let words = ["Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo", "Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo", "Aurora", "Fluffy", "Tari", "Gems", "Digital", "Emojis", "Collect", "Animo"]
 
-        selectablePhraseView = WordsFlexView(type: .selectable, words: words, width: (view.bounds.width - 50))
+        selectablePhraseView = WordsFlexView(type: .selectable, words: words.shuffled(), width: (view.bounds.width - 50))
         selectablePhraseView?.delegate = self
 
         stackView.addArrangedSubview(selectablePhraseView)
@@ -159,9 +177,52 @@ extension VerifyPhraseViewController {
         selectablePhraseView.widthAnchor.constraint(equalTo: stackView.widthAnchor).isActive = true
     }
 
+    private func setupWarningView() {
+        view.addSubview(warningView)
+
+        warningView.isHidden = true
+        warningView.translatesAutoresizingMaskIntoConstraints = false
+        warningView.topAnchor.constraint(equalTo: selectablePhraseView.topAnchor).isActive = true
+        warningView.widthAnchor.constraint(equalTo: fillablePhraseContainer.widthAnchor).isActive = true
+        warningView.centerXAnchor.constraint(equalTo: fillablePhraseContainer.centerXAnchor).isActive = true
+        warningView.heightAnchor.constraint(equalToConstant: 37).isActive = true
+
+        warningView.layer.cornerRadius = 4
+        warningView.layer.masksToBounds = true
+        warningView.layer.borderWidth = 1
+        warningView.layer.borderColor = Theme.shared.colors.warningBoxBorder?.cgColor
+
+        let warningLabel = UILabel()
+        warningView.addSubview(warningLabel)
+
+        warningLabel.textColor = Theme.shared.colors.warningBoxBorder
+        warningLabel.font = Theme.shared.fonts.warningBoxTitleLabel
+        warningLabel.text = NSLocalizedString("Nope, that’s not right", comment: "VerifyPhraseViewController warning")
+
+        warningLabel.translatesAutoresizingMaskIntoConstraints = false
+        warningLabel.centerXAnchor.constraint(equalTo: warningView.centerXAnchor).isActive = true
+        warningLabel.centerYAnchor.constraint(equalTo: warningView.centerYAnchor).isActive = true
+    }
+
+    private func setupSuccessView() {
+        successView.backgroundColor = .clear
+        successView.isHidden = true
+        successView.image = Theme.shared.images.success
+
+        view.addSubview(successView)
+
+        successView.translatesAutoresizingMaskIntoConstraints = false
+        successView.widthAnchor.constraint(equalToConstant: 29).isActive = true
+        successView.heightAnchor.constraint(equalToConstant: 29).isActive = true
+        successView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        successView.topAnchor.constraint(equalTo: selectablePhraseView.topAnchor).isActive = true
+    }
+
     private func setupContinueButton() {
         continueButton.setTitle(NSLocalizedString("Complete Verification", comment: "Recovery phrase continue button"), for: .normal)
         continueButton.addTarget(self, action: #selector(continueButtonAction), for: .touchUpInside)
+        continueButton.variation = .disabled
+
         view.addSubview(continueButton)
         continueButton.translatesAutoresizingMaskIntoConstraints = false
 
@@ -184,15 +245,36 @@ extension VerifyPhraseViewController {
     @objc private func continueButtonAction() {
 
     }
+
+    private func animateWarnintView() {
+        warningView.transform = CGAffineTransform(scaleX: 0.0, y: 0.0)
+
+        UIView.animate(withDuration: CATransaction.animationDuration(), animations: { [weak self] in
+            guard let self = self else { return }
+            self.warningView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+            self.warningView.isHidden = false
+        }, completion: nil)
+    }
+
+    private func showResultWithAnimation() {
+        let view = success ? successView : warningView
+        view.transform = CGAffineTransform(scaleX: 0.0, y: 0.0)
+
+        UIView.animate(withDuration: CATransaction.animationDuration(), animations: {
+            view.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+        })
+    }
 }
 
 extension VerifyPhraseViewController: WordsFlexViewDelegate {
     func didSelectWord(word: String, intId: Int, phraseView: WordsFlexView) {
         switch phraseView.type {
-        case .fillable: self.selectablePhraseView?.restore(word: word, intId: intId)
+        case .fillable: selectablePhraseView?.restore(word: word, intId: intId)
 
         case .selectable: fillablePhraseView?.addWord(word, intId: intId)
         }
+
+        success = selectablePhraseView.words == fillablePhraseView.words // here we should to compare with seed phrase, not arrays (this is just for tests)
 
         UIView.animate(withDuration: CATransaction.animationDuration()) {
             self.fillableContainerDescription.alpha = self.fillablePhraseView.words.isEmpty ? 1.0 : 0.0
