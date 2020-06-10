@@ -243,10 +243,17 @@ class SplashViewController: UIViewController, UITextViewDelegate {
     }
 
     @objc func onRestorWalletTap() {
-        authenticateUser { [weak self] in
-            let restoreWalletViewController = RestoreWalletViewController()
-            self?.navigationController?.pushViewController(restoreWalletViewController, animated: true)
+        do {
+            try Backup.shared.restoreWallet(completion: { (success) in
+                print(success)
+            })
+        } catch {
+            UserFeedback.shared.error(title: NSLocalizedString("Failed to restore wallet", comment: "Restore wallet failture"), description: "", error: error)
         }
+//        authenticateUser { [weak self] in
+//            let restoreWalletViewController = RestoreWalletViewController()
+//            self?.navigationController?.pushViewController(restoreWalletViewController, animated: true)
+//        }
 
     }
 

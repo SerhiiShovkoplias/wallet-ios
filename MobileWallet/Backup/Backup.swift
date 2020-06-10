@@ -40,6 +40,23 @@
 
 import Foundation
 
+enum BackupWalletError: Error {
+    case noAnyBackups
+    case unzipError
+}
+
+extension BackupWalletError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .noAnyBackups:
+            return NSLocalizedString("You have not any wallet backup", comment: "'No any wallet backup' error description")
+        case .unzipError:
+            return NSLocalizedString("Can't unarchive wallet from iCloud beckup", comment: "unarchive wallet error description")
+        }
+
+    }
+}
+
 protocol BackupObserver: AnyObject {
     func didFinishUploadBackup(percent: Double, completed: Bool, error: Error?)
 }
@@ -77,12 +94,25 @@ class Backup: NSObject {
         observers.addObject(observer)
     }
 
-    func startBackup() throws {
-        let fileURL = directory
+    // returns true if backup of current wallet is exist
+    func isBackupExist() -> Bool {
+        let fileManager = FileManager.default
+        guard let backupFolder = backupFolder else { return false }
+        if let icloudFolderURL = fileManager.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(backupFolder),
+            let urls = try? fileManager.contentsOfDirectory(at: icloudFolderURL, includingPropertiesForKeys: nil, options: []) {
+            if let _ = urls.first(where: { $0.absoluteString.contains(backupFolder) }) {
+                return true
+            }
+        }
+        return false
+    }
+
+    func createWalletBackup() throws {
         guard
+            let fileURL = try zipBackupFiles(),
             let backupFolder = backupFolder,
             let containerURL = FileManager.default.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(backupFolder)
-        else { return }
+            else { return }
 
         if !FileManager.default.fileExists(atPath: containerURL.path) {
             try FileManager.default.createDirectory(at: containerURL, withIntermediateDirectories: true, attributes: nil)
@@ -101,44 +131,82 @@ class Backup: NSObject {
         })
     }
 
-    func downloadBackup(completion:((_ path: String) -> Void)) {
+    func restoreWallet(completion: (_ success: Bool) -> Void) throws {
+        let wallets = existsWallets()
+
+        guard
+            let firstWallet = wallets.first,
+            let dbDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+            else { throw BackupWalletError.noAnyBackups }
+
+        do {
+            try Backup.shared.restoreBackup(walletFolder: firstWallet, to: dbDirectory) { (success) in
+                completion(success)
+            }
+        } catch {
+            throw error
+        }
+    }
+}
+
+// MARK: - private methods
+extension Backup {
+    private func restoreBackup(walletFolder: String, to directory: URL, completion:((_ success: Bool) -> Void)) throws {
+        downloadBackup(walletFolder: walletFolder) { [weak self] in
+            guard let zippedBackup = $0,
+                ((try? self?.unzipBackup(url: zippedBackup, to: directory)) != nil) else {
+                    completion(false)
+                    throw BackupWalletError.unzipError
+            }
+            completion(true)
+        }
+    }
+
+    private func downloadBackup(walletFolder: String, completion:((_ url: URL?) throws -> Void)) {
         let fileManager = FileManager.default
-        guard let backupFolder = backupFolder else { return }
-        if let icloudFolderURL = fileManager.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(backupFolder),
+        if let icloudFolderURL = fileManager.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(walletFolder),
             let urls = try? fileManager.contentsOfDirectory(at: icloudFolderURL, includingPropertiesForKeys: nil, options: []) {
 
-            if let backupUrl = urls.first(where: { $0.absoluteString.contains(backupFolder) }) {
+            if let backupUrl = urls.first(where: { $0.absoluteString.contains(walletFolder) }) {
                 var lastPathComponent = backupUrl.lastPathComponent
                 let folderPath = backupUrl.deletingLastPathComponent().path
                 // if the last path component contains the “.icloud” extension. If yes the file is not on the device else the file is already downloaded.
+
                 if lastPathComponent.contains(".icloud") {
                     lastPathComponent.removeFirst()
                     let downloadedFilePath = folderPath + "/" + lastPathComponent.replacingOccurrences(of: ".icloud", with: "")
                     var isDownloaded = false
+                    try? fileManager.startDownloadingUbiquitousItem(at: backupUrl)
+
                     while !isDownloaded {
                         if fileManager.fileExists(atPath: downloadedFilePath) {
                             isDownloaded = true
+                            try? completion(URL(fileURLWithPath: downloadedFilePath))
                         }
-                        completion(downloadedFilePath)
                     }
                 } else {
-                    completion(backupUrl.path)
+                    try? completion(backupUrl)
                 }
+            } else {
+                try? completion(nil)
             }
+        } else {
+            try? completion(nil)
         }
     }
 
-    // returns true if backup of current wallet is exist
-    func isBackupExist() -> Bool {
+    private func existsWallets() -> [String] {
         let fileManager = FileManager.default
-        guard let backupFolder = backupFolder else { return false }
-        if let icloudFolderURL = fileManager.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(backupFolder),
-            let urls = try? fileManager.contentsOfDirectory(at: icloudFolderURL, includingPropertiesForKeys: nil, options: []) {
-            if let _ = urls.first(where: { $0.absoluteString.contains(backupFolder) }) {
-                return true
-            }
+        var wallets = [String]()
+        if let icloudFolderURL = fileManager.url(forUbiquityContainerIdentifier: containerIdentifier) {
+            let urls = try? fileManager.contentsOfDirectory(at: icloudFolderURL, includingPropertiesForKeys: nil, options: [])
+            urls?.forEach({
+                if $0.lastPathComponent != "Documents" {
+                    wallets.append($0.lastPathComponent)
+                }
+            })
         }
-        return false
+        return wallets
     }
 
     private func addNotificationObservers() {
@@ -191,6 +259,26 @@ class Backup: NSObject {
             if let object = $0 as? BackupObserver {
                 object.didFinishUploadBackup(percent: percent, completed: completed, error: error)
             }
+        }
+    }
+
+    private func unzipBackup(url: URL, to directory: URL) throws {
+        do {
+            try FileManager.default.unzipItem(at: url, to: directory)
+        } catch {
+            throw error
+        }
+    }
+
+    private func zipBackupFiles() throws -> URL? {
+        guard let archiveURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName) else {
+            return nil
+        }
+        do {
+            try FileManager().zipItem(at: directory, to: archiveURL)
+            return archiveURL
+        } catch {
+            throw error
         }
     }
 }

@@ -332,6 +332,9 @@
 		373CCDBD2490B66E00D0A2C9 /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CCDBC2490B66E00D0A2C9 /* CircularProgressView.swift */; };
 		373CCDBE2490B66E00D0A2C9 /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CCDBC2490B66E00D0A2C9 /* CircularProgressView.swift */; };
 		373CCDBF2490B66E00D0A2C9 /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CCDBC2490B66E00D0A2C9 /* CircularProgressView.swift */; };
+		373CCDC52490F3B600D0A2C9 /* FileManager+secureCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CCDC42490F3B600D0A2C9 /* FileManager+secureCopy.swift */; };
+		373CCDC62490F3B600D0A2C9 /* FileManager+secureCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CCDC42490F3B600D0A2C9 /* FileManager+secureCopy.swift */; };
+		373CCDC72490F3B600D0A2C9 /* FileManager+secureCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373CCDC42490F3B600D0A2C9 /* FileManager+secureCopy.swift */; };
 		37547D522460165500EB59CC /* UIApplication+KeyWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37547D512460165500EB59CC /* UIApplication+KeyWindow.swift */; };
 		37547D532460165500EB59CC /* UIApplication+KeyWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37547D512460165500EB59CC /* UIApplication+KeyWindow.swift */; };
 		37547D542460165500EB59CC /* UIApplication+KeyWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37547D512460165500EB59CC /* UIApplication+KeyWindow.swift */; };
@@ -362,13 +365,13 @@
 		37AFE265245193CA006EA270 /* AlwaysPoppableNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFE264245193CA006EA270 /* AlwaysPoppableNavigationController.swift */; };
 		37AFE266245193CA006EA270 /* AlwaysPoppableNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFE264245193CA006EA270 /* AlwaysPoppableNavigationController.swift */; };
 		37AFE267245193CA006EA270 /* AlwaysPoppableNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFE264245193CA006EA270 /* AlwaysPoppableNavigationController.swift */; };
-		37B444A9248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
-		37B444AA248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
-		37B444AB248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
 		37B4449E24890F6200592D92 /* Backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B4449D24890F6200592D92 /* Backup.swift */; };
 		37B4449F24890F6200592D92 /* Backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B4449D24890F6200592D92 /* Backup.swift */; };
 		37B444A024890F6200592D92 /* Backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B4449D24890F6200592D92 /* Backup.swift */; };
 		37B444A124890F6200592D92 /* Backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B4449D24890F6200592D92 /* Backup.swift */; };
+		37B444A9248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
+		37B444AA248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
+		37B444AB248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
 		37BB696B245705D20013AC4D /* RadialGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BB696A245705D20013AC4D /* RadialGradientView.swift */; };
 		37BB696C245705E60013AC4D /* RadialGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BB696A245705D20013AC4D /* RadialGradientView.swift */; };
 		37BB696D245705E70013AC4D /* RadialGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BB696A245705D20013AC4D /* RadialGradientView.swift */; };
@@ -691,6 +694,7 @@
 		371189722488FF11004D0CE3 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		371A0817247290C000F97713 /* TransitionLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionLabel.swift; sourceTree = "<group>"; };
 		373CCDBC2490B66E00D0A2C9 /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
+		373CCDC42490F3B600D0A2C9 /* FileManager+secureCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+secureCopy.swift"; sourceTree = "<group>"; };
 		37547D512460165500EB59CC /* UIApplication+KeyWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+KeyWindow.swift"; sourceTree = "<group>"; };
 		37547D5524601BF600EB59CC /* UIView+GlobalFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+GlobalFrame.swift"; sourceTree = "<group>"; };
 		375894C424865A6A00B58816 /* VerifyPhraseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyPhraseViewController.swift; sourceTree = "<group>"; };
@@ -701,8 +705,8 @@
 		37ABB68F24781CE800F08163 /* UILabel+InterlineSpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+InterlineSpacing.swift"; sourceTree = "<group>"; };
 		37ABB69324781F8600F08163 /* UILabelWithPadding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILabelWithPadding.swift; sourceTree = "<group>"; };
 		37AFE264245193CA006EA270 /* AlwaysPoppableNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlwaysPoppableNavigationController.swift; sourceTree = "<group>"; };
-		37B444A8248949B800592D92 /* Checkbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checkbox.swift; sourceTree = "<group>"; };
 		37B4449D24890F6200592D92 /* Backup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backup.swift; sourceTree = "<group>"; };
+		37B444A8248949B800592D92 /* Checkbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checkbox.swift; sourceTree = "<group>"; };
 		37BB696A245705D20013AC4D /* RadialGradientView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadialGradientView.swift; sourceTree = "<group>"; };
 		37BB6973245726FB0013AC4D /* CopyableLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CopyableLabel.swift; sourceTree = "<group>"; };
 		37C8BA342480F59B005BBC05 /* WaveEmojiAnimation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = WaveEmojiAnimation.json; sourceTree = "<group>"; };
@@ -884,6 +888,7 @@
 				37ABB68F24781CE800F08163 /* UILabel+InterlineSpacing.swift */,
 				37C8BA46248126B4005BBC05 /* UIScrollView+RefreshControl.swift */,
 				37CFAA75248FE28600DEA096 /* NSPointerArray+Extension.swift */,
+				373CCDC42490F3B600D0A2C9 /* FileManager+secureCopy.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1298,6 +1303,14 @@
 			path = AlwaysPoppableNavigationController;
 			sourceTree = "<group>";
 		};
+		37B4449C24890F3000592D92 /* Backup */ = {
+			isa = PBXGroup;
+			children = (
+				37B4449D24890F6200592D92 /* Backup.swift */,
+			);
+			path = Backup;
+			sourceTree = "<group>";
+		};
 		37B444A72489436100592D92 /* Checkbox */ = {
 			isa = PBXGroup;
 			children = (
@@ -1306,14 +1319,6 @@
 				37B444A8248949B800592D92 /* Checkbox.swift */,
 			);
 			path = Checkbox;
-			sourceTree = "<group>";
-		};
-		37B4449C24890F3000592D92 /* Backup */ = {
-			isa = PBXGroup;
-			children = (
-				37B4449D24890F6200592D92 /* Backup.swift */,
-			);
-			path = Backup;
 			sourceTree = "<group>";
 		};
 		37BB6969245705D20013AC4D /* RadialGradientView */ = {
@@ -2115,6 +2120,7 @@
 				3708D752247FF7D000807D72 /* BackUpWalletSettings.swift in Sources */,
 				004277F723E0628A00AE7BD9 /* UIViewController.swift in Sources */,
 				00230B022376C75B00F23E34 /* TransactionsTableViewControllerExtension.swift in Sources */,
+				373CCDC52490F3B600D0A2C9 /* FileManager+secureCopy.swift in Sources */,
 				004997AB2382E893000A0B7D /* PendingOutboundTransactions.swift in Sources */,
 				37C8BA4B24813F33005BBC05 /* SeedPhraseViewController.swift in Sources */,
 				0087A1AF23F4235400B89EE7 /* ContactCell.swift in Sources */,
@@ -2251,6 +2257,7 @@
 				004277DE23DC2EAB00AE7BD9 /* EmojiButton.swift in Sources */,
 				37C8BA5024813F98005BBC05 /* SettingsParentTableViewController.swift in Sources */,
 				37ABB69124781CE800F08163 /* UILabel+InterlineSpacing.swift in Sources */,
+				373CCDC62490F3B600D0A2C9 /* FileManager+secureCopy.swift in Sources */,
 				37B444AA248949B800592D92 /* Checkbox.swift in Sources */,
 				00BBD813237E9EE200EBF5E6 /* PrivateKey.swift in Sources */,
 				BFF1ED9E2408111000CC9EF6 /* SendingTariViewController.swift in Sources */,
@@ -2360,6 +2367,7 @@
 				37CFAA78248FE28600DEA096 /* NSPointerArray+Extension.swift in Sources */,
 				00BBD807237D755600EBF5E6 /* HelperFunctions.swift in Sources */,
 				0042780523E8421200AE7BD9 /* String.swift in Sources */,
+				373CCDC72490F3B600D0A2C9 /* FileManager+secureCopy.swift in Sources */,
 				371A081A247290C000F97713 /* TransitionLabel.swift in Sources */,
 				00A66525243B3E380046E730 /* ErrorView.swift in Sources */,
 				0072BF2A247EB3AA00BD28FB /* ReminderNotifications.swift in Sources */,

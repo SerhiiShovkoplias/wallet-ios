@@ -82,7 +82,7 @@ class BackUpWalletSettings: SettingsParentTableViewController {
 
     private func onBackUpToiCloudAction() {
         do {
-            try backup.startBackup()
+            try backup.createWalletBackup()
             iCloudBackUpItem.mark = .progress
         } catch {
             UserFeedback.shared.error(title: NSLocalizedString("Failed to create backup", comment: "Backup wallet settings"), description: "", error: error)
