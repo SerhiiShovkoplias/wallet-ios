@@ -40,29 +40,43 @@
 
 import UIKit
 
-struct AppTableViewCellItem {
+class AppTableViewCellItem: NSObject {
     let title: String
-    var mark: AppTableViewCell.AppTableViewCellMark = .none
+
+    @objc dynamic var mark: AppTableViewCell.AppTableViewCellMark = .none
+    @objc dynamic var percent: Double = 0.0
+
+    init(title: String, mark: AppTableViewCell.AppTableViewCellMark = .none) {
+        self.title = title
+        super.init()
+    }
 }
 
 class AppTableViewCell: UITableViewCell {
 
-    enum AppTableViewCellMark: Equatable {
-        case none
+    @objc enum AppTableViewCellMark: Int {
+        case none = 0
         case attention
         case success
+        case progress
     }
 
     private let arrow = UIImageView()
     private let markImageView = UIImageView()
     private let titleLabel = UILabel()
+    private let progressView = CircularProgressView()
+
+    private var kvoPercentToken: NSKeyValueObservation?
+    private var kvoMarkToken: NSKeyValueObservation?
 
     var mark: AppTableViewCellMark = .none {
         didSet {
+            if mark == oldValue { return }
             switch mark {
-            case .none: markImageView.image = nil
-            case .attention: markImageView.image = Theme.shared.images.attention!
-            case .success: markImageView.image = Theme.shared.images.success!
+            case .none: markImageView.image = nil; progressView.isHidden = true
+            case .attention: markImageView.image = Theme.shared.images.attention!; progressView.isHidden = true
+            case .success: markImageView.image = Theme.shared.images.success!; progressView.isHidden = true
+            case .progress: markImageView.image = nil; progressView.isHidden = false
             }
         }
     }
@@ -93,23 +107,42 @@ class AppTableViewCell: UITableViewCell {
     func configure(_ item: AppTableViewCellItem) {
         titleLabel.text = item.title
         mark = item.mark
+        observe(item: item)
+    }
+
+    private func observe(item: AppTableViewCellItem) {
+        kvoPercentToken = item.observe(\.percent, options: .new) { [weak self] (item, _) in
+            self?.progressView.setProgress(item.percent/100.0)
+        }
+
+        kvoMarkToken = item.observe(\.mark, options: .new) { [weak self] (item, _) in
+            self?.mark = item.mark
+        }
+    }
+
+    deinit {
+        kvoPercentToken?.invalidate()
+        kvoMarkToken?.invalidate()
     }
 }
 
 // MARK: Setup views
 extension AppTableViewCell {
     private func setupView() {
-//        backgroundColor = .clear
         contentView.backgroundColor = Theme.shared.colors.appTableViewCellBackground
 
         setupArrow()
         setupMark()
+        setupProgressView()
         setupTitle()
     }
 
     override func prepareForReuse() {
         mark = .none
         titleLabel.text = nil
+
+        kvoPercentToken?.invalidate()
+        kvoMarkToken?.invalidate()
     }
 
     private func setupArrow() {
@@ -133,6 +166,18 @@ extension AppTableViewCell {
         markImageView.heightAnchor.constraint(equalToConstant: 21).isActive = true
         markImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
         markImageView.trailingAnchor.constraint(equalTo: arrow.leadingAnchor, constant: -12).isActive = true
+    }
+
+    private func setupProgressView() {
+        progressView.backgroundColor = .clear
+        progressView.isHidden = true
+        addSubview(progressView)
+
+        progressView.translatesAutoresizingMaskIntoConstraints = false
+        progressView.widthAnchor.constraint(equalToConstant: 21).isActive = true
+        progressView.heightAnchor.constraint(equalToConstant: 21).isActive = true
+        progressView.centerYAnchor.constraint(equalTo: markImageView.centerYAnchor).isActive = true
+        progressView.centerXAnchor.constraint(equalTo: markImageView.centerXAnchor).isActive = true
     }
 
     private func setupTitle() {

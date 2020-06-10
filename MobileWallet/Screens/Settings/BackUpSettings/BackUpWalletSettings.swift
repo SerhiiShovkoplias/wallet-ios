@@ -41,9 +41,20 @@
 import UIKit
 
 class BackUpWalletSettings: SettingsParentTableViewController {
+
+    private lazy var backup: Backup = {
+        let backup = Backup.shared
+        backup.addObserver(self)
+        return backup
+    }()
+
     private let items: [AppTableViewCellItem] = [
         AppTableViewCellItem(title: BackUpWalletSettingsItem.backUpToiCloud.localized(), mark: .attention),
         AppTableViewCellItem(title: BackUpWalletSettingsItem.backUpWithRecoveryPhrase.localized(), mark: .attention)]
+
+    private lazy var backUpItem: AppTableViewCellItem = {
+        return self.items.first(where: { $0.title == BackUpWalletSettingsItem.backUpToiCloud.localized() })!
+    }()
 
     private enum BackUpWalletSettingsItem: String {
         case backUpToiCloud = "Back up to iCloud"
@@ -64,20 +75,34 @@ class BackUpWalletSettings: SettingsParentTableViewController {
     }
 
     private func onBackUpToiCloudAction() {
-//        let backup = Backup()
-
-//        backup.downloadBackup { (path) in
-//            print(path)
-//        }
-//        do {
-//            try backup.startBackup()
-//        } catch {
-//            print("SHOVQ D throw")
-//        }
+        do {
+            try backup.startBackup()
+            backUpItem.mark = .progress
+        } catch {
+            UserFeedback.shared.error(title: NSLocalizedString("Failed to create backup", comment: "Backup wallet settings"), description: "", error: error)
+            backUpItem.mark = .attention
+        }
     }
 
     private func onBackUpWithRecoveryPhraseAction() {
         navigationController?.pushViewController(SeedPhraseViewController(), animated: true)
+    }
+}
+
+extension BackUpWalletSettings: BackupObserver {
+    func didFinishUploadBackup(percent: Double, completed: Bool, error: Error?) {
+        if error != nil {
+            backUpItem.mark = .attention
+            return
+        }
+
+        backUpItem.percent = percent
+
+        if completed {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                self?.backUpItem.mark = .success
+            }
+        }
     }
 }
 

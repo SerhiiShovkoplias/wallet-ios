@@ -40,6 +40,10 @@
 
 import Foundation
 
+protocol BackupObserver: AnyObject {
+    func didFinishUploadBackup(percent: Double, completed: Bool, error: Error?)
+}
+
 class Backup: NSObject {
 
     var query: NSMetadataQuery!
@@ -48,6 +52,10 @@ class Backup: NSObject {
     private let DocumentsFolder = "Documents"
     private let directory = TariLib.shared.databaseDirectory
     private let fileName = TariLib.databaseName
+
+    private var observers = NSPointerArray.weakObjects()
+
+    static let shared = Backup()
 
     override init() {
         super.init()
@@ -60,6 +68,10 @@ class Backup: NSObject {
         query.operationQueue = .main
         query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
         query.predicate = NSPredicate(format: "%K LIKE %@", NSMetadataItemFSNameKey, fileName)
+    }
+
+    func addObserver(_ observer: BackupObserver) {
+        observers.addObject(observer)
     }
 
     func startBackup() throws {
@@ -111,6 +123,7 @@ class Backup: NSObject {
 
     private func addNotificationObservers() {
         NotificationCenter.default.addObserver(forName: NSNotification.Name.NSMetadataQueryDidStartGathering, object: query, queue: query.operationQueue) { [weak self] (_) in
+            self?.notifyObservers(percent: 0, completed: false, error: nil)
             self?.processCloudFiles()
         }
 
@@ -136,14 +149,22 @@ class Backup: NSObject {
 
         let fileValues = try? fileURL!.resourceValues(forKeys: [URLResourceKey.ubiquitousItemIsUploadingKey])
         if let fileUploaded = fileItem?.value(forAttribute: NSMetadataUbiquitousItemIsUploadedKey) as? Bool, fileUploaded == true, fileValues?.ubiquitousItemIsUploading == false {
-            print("backup upload complete")
+            notifyObservers(percent: 100, completed: true, error: nil)
 
         } else if let error = fileValues?.ubiquitousItemUploadingError {
-            print("upload error---", error.localizedDescription)
+            notifyObservers(percent: 0, completed: false, error: error)
 
         } else {
             if let fileProgress = fileItem?.value(forAttribute: NSMetadataUbiquitousItemPercentUploadedKey) as? Double {
-                print("uploaded percent ---", fileProgress)
+                notifyObservers(percent: fileProgress, completed: false, error: nil)
+            }
+        }
+    }
+
+    private func notifyObservers(percent: Double, completed: Bool, error: Error?) {
+        observers.allObjects.forEach {
+            if let object = $0 as? BackupObserver {
+                object.didFinishUploadBackup(percent: percent, completed: completed, error: error)
             }
         }
     }
