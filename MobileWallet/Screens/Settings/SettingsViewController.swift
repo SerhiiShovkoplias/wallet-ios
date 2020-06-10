@@ -69,6 +69,10 @@ class SettingsViewController: SettingsParentTableViewController {
     private let headers: [SettingsItemTitle] = [.securityHeader, .moreHeader]
     private let securitySectionItems: [AppTableViewCellItem] = [AppTableViewCellItem(title: SettingsItemTitle.backUpWallet.localized(), mark: .attention)]
 
+    private lazy var backUpWalletItem: AppTableViewCellItem = {
+        return self.securitySectionItems.first(where: { $0.title == SettingsItemTitle.backUpWallet.localized() })!
+    }()
+
     private let moreSectionItems: [AppTableViewCellItem] = [
         AppTableViewCellItem(title: SettingsItemTitle.visitTari.localized()),
         AppTableViewCellItem(title: SettingsItemTitle.contributeToTariAurora.localized()),
@@ -87,6 +91,13 @@ class SettingsViewController: SettingsParentTableViewController {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
+
+        NotificationCenter.default.addObserver(self, selector: #selector(updateMarks), name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateMarks()
     }
 
     private func onBackUpWalletAction() {
@@ -101,6 +112,10 @@ class SettingsViewController: SettingsParentTableViewController {
         else { return }
 
         UserFeedback.shared.openWebBrowser(url: url!)
+    }
+
+    @objc private func updateMarks() {
+        backUpWalletItem.mark = Backup.shared.isBackupExist() ? .success : .attention
     }
 }
 
