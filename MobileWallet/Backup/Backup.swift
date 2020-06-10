@@ -49,11 +49,14 @@ class Backup: NSObject {
     var query: NSMetadataQuery!
 
     private let containerIdentifier = "iCloud.com.tari.wallet"
-    private let DocumentsFolder = "Documents"
+    private let backupFolder = TariLib.shared.tariWallet?.publicKey.0?.hex.0
     private let directory = TariLib.shared.databaseDirectory
     private let fileName = TariLib.databaseName
 
     private var observers = NSPointerArray.weakObjects()
+
+    var inProgress: Bool = false
+    private(set) var progressValue: Double = 0.0
 
     static let shared = Backup()
 
@@ -66,7 +69,7 @@ class Backup: NSObject {
     func initialiseQuery() {
         query = NSMetadataQuery.init()
         query.operationQueue = .main
-        query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
+        query.searchScopes = [NSMetadataQueryUbiquitousDataScope]
         query.predicate = NSPredicate(format: "%K LIKE %@", NSMetadataItemFSNameKey, fileName)
     }
 
@@ -76,7 +79,10 @@ class Backup: NSObject {
 
     func startBackup() throws {
         let fileURL = directory
-        guard let containerURL = FileManager.default.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(DocumentsFolder) else { return }
+        guard
+            let backupFolder = backupFolder,
+            let containerURL = FileManager.default.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(backupFolder)
+        else { return }
 
         if !FileManager.default.fileExists(atPath: containerURL.path) {
             try FileManager.default.createDirectory(at: containerURL, withIntermediateDirectories: true, attributes: nil)
@@ -97,12 +103,13 @@ class Backup: NSObject {
 
     func downloadBackup(completion:((_ path: String) -> Void)) {
         let fileManager = FileManager.default
-        if let icloudFolderURL = fileManager.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(DocumentsFolder),
+        guard let backupFolder = backupFolder else { return }
+        if let icloudFolderURL = fileManager.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(backupFolder),
             let urls = try? fileManager.contentsOfDirectory(at: icloudFolderURL, includingPropertiesForKeys: nil, options: []) {
 
-            if let myURL = urls.first {
-                var lastPathComponent = myURL.lastPathComponent
-                let folderPath = myURL.deletingLastPathComponent().path
+            if let backupUrl = urls.first(where: { $0.absoluteString.contains(backupFolder) }) {
+                var lastPathComponent = backupUrl.lastPathComponent
+                let folderPath = backupUrl.deletingLastPathComponent().path
                 // if the last path component contains the “.icloud” extension. If yes the file is not on the device else the file is already downloaded.
                 if lastPathComponent.contains(".icloud") {
                     lastPathComponent.removeFirst()
@@ -115,15 +122,30 @@ class Backup: NSObject {
                         completion(downloadedFilePath)
                     }
                 } else {
-                    completion(myURL.path)
+                    completion(backupUrl.path)
                 }
             }
         }
     }
 
+    // returns true if backup of current wallet is exist
+    func isBackupExist() -> Bool {
+        let fileManager = FileManager.default
+        guard let backupFolder = backupFolder else { return false }
+        if let icloudFolderURL = fileManager.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(backupFolder),
+            let urls = try? fileManager.contentsOfDirectory(at: icloudFolderURL, includingPropertiesForKeys: nil, options: []) {
+            if let _ = urls.first(where: { $0.absoluteString.contains(backupFolder) }) {
+                return true
+            }
+        }
+        return false
+    }
+
     private func addNotificationObservers() {
         NotificationCenter.default.addObserver(forName: NSNotification.Name.NSMetadataQueryDidStartGathering, object: query, queue: query.operationQueue) { [weak self] (_) in
             self?.notifyObservers(percent: 0, completed: false, error: nil)
+            self?.inProgress = true
+            self?.progressValue = 0.0
             self?.processCloudFiles()
         }
 
@@ -150,13 +172,16 @@ class Backup: NSObject {
         let fileValues = try? fileURL!.resourceValues(forKeys: [URLResourceKey.ubiquitousItemIsUploadingKey])
         if let fileUploaded = fileItem?.value(forAttribute: NSMetadataUbiquitousItemIsUploadedKey) as? Bool, fileUploaded == true, fileValues?.ubiquitousItemIsUploading == false {
             notifyObservers(percent: 100, completed: true, error: nil)
-
+            progressValue = 0.0
+            inProgress = false
         } else if let error = fileValues?.ubiquitousItemUploadingError {
             notifyObservers(percent: 0, completed: false, error: error)
-
+            progressValue = 0.0
+            inProgress = false
         } else {
             if let fileProgress = fileItem?.value(forAttribute: NSMetadataUbiquitousItemPercentUploadedKey) as? Double {
                 notifyObservers(percent: fileProgress, completed: false, error: nil)
+                progressValue = fileProgress
             }
         }
     }

@@ -48,11 +48,10 @@ class BackUpWalletSettings: SettingsParentTableViewController {
         return backup
     }()
 
-    private let items: [AppTableViewCellItem] = [
-        AppTableViewCellItem(title: BackUpWalletSettingsItem.backUpToiCloud.localized(), mark: .attention),
-        AppTableViewCellItem(title: BackUpWalletSettingsItem.backUpWithRecoveryPhrase.localized(), mark: .attention)]
+    private let items: [AppTableViewCellItem] = [AppTableViewCellItem(title: BackUpWalletSettingsItem.backUpToiCloud.localized(), mark: .attention)]
+        // AppTableViewCellItem(title: BackUpWalletSettingsItem.backUpWithRecoveryPhrase.localized(), mark: .attention)]
 
-    private lazy var backUpItem: AppTableViewCellItem = {
+    private lazy var iCloudBackUpItem: AppTableViewCellItem = {
         return self.items.first(where: { $0.title == BackUpWalletSettingsItem.backUpToiCloud.localized() })!
     }()
 
@@ -72,35 +71,54 @@ class BackUpWalletSettings: SettingsParentTableViewController {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
+
+        NotificationCenter.default.addObserver(self, selector: #selector(updateMarks), name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateMarks()
     }
 
     private func onBackUpToiCloudAction() {
         do {
             try backup.startBackup()
-            backUpItem.mark = .progress
+            iCloudBackUpItem.mark = .progress
         } catch {
             UserFeedback.shared.error(title: NSLocalizedString("Failed to create backup", comment: "Backup wallet settings"), description: "", error: error)
-            backUpItem.mark = .attention
+            iCloudBackUpItem.mark = .attention
         }
     }
 
     private func onBackUpWithRecoveryPhraseAction() {
         navigationController?.pushViewController(SeedPhraseViewController(), animated: true)
     }
+
+    @objc private func updateMarks() {
+        if backup.inProgress {
+            iCloudBackUpItem.mark = .progress
+            iCloudBackUpItem.percent = backup.progressValue
+            return
+        }
+
+        iCloudBackUpItem.mark = backup.isBackupExist() ? .success : .attention
+    }
 }
 
 extension BackUpWalletSettings: BackupObserver {
     func didFinishUploadBackup(percent: Double, completed: Bool, error: Error?) {
         if error != nil {
-            backUpItem.mark = .attention
+            UserFeedback.shared.error(title: NSLocalizedString("Failed to create backup", comment: "Backup wallet settings"), description: "", error: error)
+            iCloudBackUpItem.mark = .attention
             return
         }
 
-        backUpItem.percent = percent
+        iCloudBackUpItem.percent = percent
 
         if completed {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                self?.backUpItem.mark = .success
+                self?.iCloudBackUpItem.mark = .success
+                self?.iCloudBackUpItem.percent = 0.0
             }
         }
     }

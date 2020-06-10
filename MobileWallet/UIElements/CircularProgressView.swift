@@ -44,25 +44,25 @@ class CircularProgressView: UIView {
     private var circleLayer = CAShapeLayer()
     private var progressLayer = CAShapeLayer()
 
-    var circleLayerColor: UIColor = .black {
+    var circleLayerColor: UIColor = Theme.shared.colors.settingsTableStyleBackground! {
         didSet {
             circleLayer.strokeColor = circleLayerColor.cgColor
         }
     }
 
-    var circleLayerLineWidth: CGFloat = 5.0 {
+    var circleLayerLineWidth: CGFloat = 4.0 {
         didSet {
             circleLayer.lineWidth = circleLayerLineWidth
         }
     }
 
-    var progressLayerColor: UIColor = .systemPink {
+    var progressLayerColor: UIColor = Theme.shared.colors.checkBoxBorderColor! {
         didSet {
             progressLayer.strokeColor = progressLayerColor.cgColor
         }
     }
 
-    var progressLayerLineWidth: CGFloat = 2.5 {
+    var progressLayerLineWidth: CGFloat = 2.0 {
         didSet {
             progressLayer.lineWidth = progressLayerLineWidth
         }
@@ -73,7 +73,7 @@ class CircularProgressView: UIView {
     }
 
     func createCircularPath() {
-        let circularPath = UIBezierPath(arcCenter: CGPoint(x: frame.size.width / 2.0, y: frame.size.height / 2.0), radius: frame.height/2, startAngle: -.pi / 2, endAngle: 3 * .pi / 2, clockwise: true)
+        let circularPath = UIBezierPath(arcCenter: CGPoint(x: frame.size.width / 2.0, y: frame.size.height / 2.0), radius: frame.height/2 - circleLayerLineWidth/2, startAngle: -.pi / 2, endAngle: 3 * .pi / 2, clockwise: true)
 
         circleLayer.path = circularPath.cgPath
         circleLayer.fillColor = UIColor.clear.cgColor
@@ -83,10 +83,11 @@ class CircularProgressView: UIView {
 
         progressLayer.path = circularPath.cgPath
         progressLayer.fillColor = UIColor.clear.cgColor
+        progressLayer.strokeColor = progressLayerColor.cgColor
         progressLayer.lineCap = .round
         progressLayer.lineWidth = progressLayerLineWidth
         progressLayer.strokeEnd = 0
-        progressLayer.strokeColor = progressLayerColor.cgColor
+
         layer.addSublayer(circleLayer)
         layer.addSublayer(progressLayer)
     }

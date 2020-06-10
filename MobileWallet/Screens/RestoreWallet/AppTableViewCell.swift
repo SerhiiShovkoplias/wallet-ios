@@ -48,6 +48,7 @@ class AppTableViewCellItem: NSObject {
 
     init(title: String, mark: AppTableViewCell.AppTableViewCellMark = .none) {
         self.title = title
+        self.mark = mark
         super.init()
     }
 }
@@ -55,7 +56,7 @@ class AppTableViewCellItem: NSObject {
 class AppTableViewCell: UITableViewCell {
 
     @objc enum AppTableViewCellMark: Int {
-        case none = 0
+        case none
         case attention
         case success
         case progress
@@ -72,11 +73,12 @@ class AppTableViewCell: UITableViewCell {
     var mark: AppTableViewCellMark = .none {
         didSet {
             if mark == oldValue { return }
+            isUserInteractionEnabled = true
             switch mark {
             case .none: markImageView.image = nil; progressView.isHidden = true
             case .attention: markImageView.image = Theme.shared.images.attention!; progressView.isHidden = true
             case .success: markImageView.image = Theme.shared.images.success!; progressView.isHidden = true
-            case .progress: markImageView.image = nil; progressView.isHidden = false
+            case .progress: markImageView.image = nil; progressView.isHidden = false; isUserInteractionEnabled = false
             }
         }
     }
@@ -174,8 +176,8 @@ extension AppTableViewCell {
         addSubview(progressView)
 
         progressView.translatesAutoresizingMaskIntoConstraints = false
-        progressView.widthAnchor.constraint(equalToConstant: 21).isActive = true
-        progressView.heightAnchor.constraint(equalToConstant: 21).isActive = true
+        progressView.widthAnchor.constraint(equalToConstant: 25).isActive = true
+        progressView.heightAnchor.constraint(equalToConstant: 25).isActive = true
         progressView.centerYAnchor.constraint(equalTo: markImageView.centerYAnchor).isActive = true
         progressView.centerXAnchor.constraint(equalTo: markImageView.centerXAnchor).isActive = true
     }
