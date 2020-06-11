@@ -454,14 +454,6 @@
 		BF0A77C52420DA3200861A3E /* TouchIdAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = BF0A77C32420DA3200861A3E /* TouchIdAnimation.json */; };
 		BF0A77C62420DA3200861A3E /* TouchIdAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = BF0A77C32420DA3200861A3E /* TouchIdAnimation.json */; };
 		BF0A77C72420DA3200861A3E /* TouchIdAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = BF0A77C32420DA3200861A3E /* TouchIdAnimation.json */; };
-		BF162BFC241A40E800647740 /* LoadingButtonAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = BF162BFB241A40E800647740 /* LoadingButtonAnimation.json */; };
-		BF162BFD241A42C100647740 /* LoadingButtonAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = BF162BFB241A40E800647740 /* LoadingButtonAnimation.json */; };
-		BF162BFE241A42C200647740 /* LoadingButtonAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = BF162BFB241A40E800647740 /* LoadingButtonAnimation.json */; };
-		BF162BFF241A42C200647740 /* LoadingButtonAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = BF162BFB241A40E800647740 /* LoadingButtonAnimation.json */; };
-		BF162C01241A510D00647740 /* loader.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = BF162C00241A510C00647740 /* loader.mp4 */; };
-		BF162C02241A510D00647740 /* loader.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = BF162C00241A510C00647740 /* loader.mp4 */; };
-		BF162C03241A510D00647740 /* loader.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = BF162C00241A510C00647740 /* loader.mp4 */; };
-		BF162C04241A510D00647740 /* loader.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = BF162C00241A510C00647740 /* loader.mp4 */; };
 		BF191A0D23E5A96700D33C85 /* EmojiWheel.json in Resources */ = {isa = PBXBuildFile; fileRef = BF191A0C23E5A96700D33C85 /* EmojiWheel.json */; };
 		BF191A0E23E5A96700D33C85 /* EmojiWheel.json in Resources */ = {isa = PBXBuildFile; fileRef = BF191A0C23E5A96700D33C85 /* EmojiWheel.json */; };
 		BF191A0F23E5A96700D33C85 /* EmojiWheel.json in Resources */ = {isa = PBXBuildFile; fileRef = BF191A0C23E5A96700D33C85 /* EmojiWheel.json */; };
@@ -747,8 +739,6 @@
 		BF0A779B241F904D00861A3E /* faceId@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "faceId@2x.png"; sourceTree = "<group>"; };
 		BF0A77B42420CF1200861A3E /* NotificationAnimation.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = NotificationAnimation.json; sourceTree = "<group>"; };
 		BF0A77C32420DA3200861A3E /* TouchIdAnimation.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = TouchIdAnimation.json; sourceTree = "<group>"; };
-		BF162BFB241A40E800647740 /* LoadingButtonAnimation.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = LoadingButtonAnimation.json; sourceTree = "<group>"; };
-		BF162C00241A510C00647740 /* loader.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = loader.mp4; sourceTree = "<group>"; };
 		BF191A0C23E5A96700D33C85 /* EmojiWheel.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = EmojiWheel.json; sourceTree = "<group>"; };
 		BF191A1023E5AFA100D33C85 /* img_4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = img_4.png; sourceTree = "<group>"; };
 		BF191A1123E5AFA100D33C85 /* img_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = img_2.png; sourceTree = "<group>"; };
@@ -841,7 +831,6 @@
 				BF0A77AE2420CE5900861A3E /* TouchIdAnimation */,
 				BF0A77AD2420CE4300861A3E /* NotificationAnimation */,
 				BF0A7764241EE9E400861A3E /* FaceIdAnimation */,
-				BF162BFA241A40C900647740 /* LoadingButtonAnimation */,
 				BF191A3023E70D1700D33C85 /* NerdEmojiAnimation */,
 				BF191A2E23E5B07F00D33C85 /* SplashAnimation */,
 				BF191A2F23E5B09900D33C85 /* RotatingStarsAnimation */,
@@ -1411,15 +1400,6 @@
 			path = TouchIdAnimation;
 			sourceTree = "<group>";
 		};
-		BF162BFA241A40C900647740 /* LoadingButtonAnimation */ = {
-			isa = PBXGroup;
-			children = (
-				BF162C00241A510C00647740 /* loader.mp4 */,
-				BF162BFB241A40E800647740 /* LoadingButtonAnimation.json */,
-			);
-			path = LoadingButtonAnimation;
-			sourceTree = "<group>";
-		};
 		BF191A2C23E5B02F00D33C85 /* EmojiWheelAnimation */ = {
 			isa = PBXGroup;
 			children = (
@@ -1668,11 +1648,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF0A77A7241F904D00861A3E /* faceId@2x.png in Resources */,
-				BF162C04241A510D00647740 /* loader.mp4 in Resources */,
 				0048AF46245ADCA300E1A359 /* env.json in Resources */,
 				BF0A77B82420CF1200861A3E /* NotificationAnimation.json in Resources */,
 				BF0A7769241EEA0A00861A3E /* FaceID.json in Resources */,
-				BF162BFF241A42C200647740 /* LoadingButtonAnimation.json in Resources */,
 				BF0A77C72420DA3200861A3E /* TouchIdAnimation.json in Resources */,
 				BF0A77A3241F904D00861A3E /* faceId.png in Resources */,
 				BF0A779F241F904D00861A3E /* faceId@3x.png in Resources */,
@@ -1694,7 +1672,6 @@
 				00A66517243772A70046E730 /* pendingTx.json in Resources */,
 				BFF1EDA72408226200CC9EF6 /* sending-background.mp4 in Resources */,
 				00E491AB2366E08F007B332D /* LaunchScreen.storyboard in Resources */,
-				BF162C01241A510D00647740 /* loader.mp4 in Resources */,
 				BF5537B92412B9BB0071328C /* purple_orb.mp4 in Resources */,
 				00A6651F2437AD9A0046E730 /* SplashAnimation.json in Resources */,
 				BF0A779C241F904D00861A3E /* faceId@3x.png in Resources */,
@@ -1718,7 +1695,6 @@
 				BF191A1A23E5AFA200D33C85 /* img_2.png in Resources */,
 				37EE027E248A4DCC00E25D69 /* checkbox-deselectAnimation.json in Resources */,
 				BF191A2323E5AFA200D33C85 /* img_5.png in Resources */,
-				BF162BFC241A40E800647740 /* LoadingButtonAnimation.json in Resources */,
 				BF191A2623E5AFA200D33C85 /* img_3.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1727,7 +1703,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF162C02241A510D00647740 /* loader.mp4 in Resources */,
 				BF191A2423E5AFA200D33C85 /* img_5.png in Resources */,
 				00230B052376C7F800F23E34 /* Assets.xcassets in Resources */,
 				37C8BA362480F59B005BBC05 /* WaveEmojiAnimation.json in Resources */,
@@ -1747,7 +1722,6 @@
 				BF0A77B62420CF1200861A3E /* NotificationAnimation.json in Resources */,
 				BFF1EDA42408225900CC9EF6 /* sendingTariAnimation.json in Resources */,
 				0048AF44245ADCA300E1A359 /* env.json in Resources */,
-				BF162BFD241A42C100647740 /* LoadingButtonAnimation.json in Resources */,
 				BF191A2723E5AFA200D33C85 /* img_3.png in Resources */,
 				BF191A2A23E5AFA200D33C85 /* img_0.png in Resources */,
 				BF191A2123E5AFA200D33C85 /* img_1.png in Resources */,
@@ -1760,7 +1734,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF162C03241A510D00647740 /* loader.mp4 in Resources */,
 				BF191A2523E5AFA200D33C85 /* img_5.png in Resources */,
 				00230B062376C7F900F23E34 /* Assets.xcassets in Resources */,
 				37C8BA372480F59B005BBC05 /* WaveEmojiAnimation.json in Resources */,
@@ -1780,7 +1753,6 @@
 				BF0A77B72420CF1200861A3E /* NotificationAnimation.json in Resources */,
 				BFF1EDA52408225900CC9EF6 /* sendingTariAnimation.json in Resources */,
 				0048AF45245ADCA300E1A359 /* env.json in Resources */,
-				BF162BFE241A42C200647740 /* LoadingButtonAnimation.json in Resources */,
 				BF191A2823E5AFA200D33C85 /* img_3.png in Resources */,
 				BF191A2B23E5AFA200D33C85 /* img_0.png in Resources */,
 				BF191A2223E5AFA200D33C85 /* img_1.png in Resources */,
