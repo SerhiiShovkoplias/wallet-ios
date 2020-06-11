@@ -39,12 +39,14 @@
 */
 
 import UIKit
+import LocalAuthentication
 
 class RestoreWalletViewController: UIViewController {
+    private let pendingView = RestoreWalletPendingView()
     private let tableView = UITableView()
     private let items: [AppTableViewCellItem] = [
-        AppTableViewCellItem(title: RestoreCellTitle.iCloudRestore.localized()),
-        AppTableViewCellItem(title: RestoreCellTitle.phraseRestore.localized())]
+        AppTableViewCellItem(title: RestoreCellTitle.iCloudRestore.localized())]
+    // AppTableViewCellItem(title: RestoreCellTitle.phraseRestore.localized())]
 
     private enum RestoreCellTitle: String {
         case iCloudRestore = "Restore with iCloud"
@@ -87,6 +89,39 @@ extension RestoreWalletViewController: UITableViewDelegate, UITableViewDataSourc
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
+
+        guard let item = RestoreCellTitle(rawValue: items[indexPath.row].title) else { return }
+
+        switch item {
+        case .iCloudRestore: oniCloudRestoreAction()
+        case .phraseRestore: onPhraseRestoreAction()
+        }
+    }
+
+    private func oniCloudRestoreAction() {
+        let locatAuth = LAContext()
+        locatAuth.authenticateUser(reason: .userVerification) { [weak self] in
+            self?.pendingView.showPendingView {
+                do {
+                    try Backup.shared.restoreWallet(completion: {(success) in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                            self?.pendingView.hidePendingView { [weak self] in
+                                if success {
+                                    UserDefaults.standard.set(true, forKey: "authStepPassed")
+                                    self?.returnToSplashScreen()
+                                }
+                            }
+                        }
+                    })
+                } catch {
+                    UserFeedback.shared.error(title: NSLocalizedString("Failed to restore wallet", comment: "Restore wallet failture"), description: "", error: error)
+                }
+            }
+        }
+    }
+
+    private func onPhraseRestoreAction() {
+
     }
 }
 
@@ -97,6 +132,7 @@ extension RestoreWalletViewController {
         navigationBar.backgroundColor = Theme.shared.colors.settingsTableStyleBackground
         setupNavigationBar()
         setupTableView()
+        setupPendingView()
     }
 
     private func setupNavigationBar() {
@@ -126,5 +162,34 @@ extension RestoreWalletViewController {
         tableView.heightAnchor.constraint(equalToConstant: 128).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+    }
+
+    private func setupPendingView() {
+        view.addSubview(pendingView)
+        pendingView.alpha = 0.0
+        pendingView.isHidden = true
+
+        pendingView.translatesAutoresizingMaskIntoConstraints = false
+        pendingView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        pendingView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        pendingView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        pendingView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+    }
+
+    private func returnToSplashScreen() {
+        if let curentControllers = navigationController?.viewControllers {
+            var newStack = [UIViewController]()
+            curentControllers.forEach({
+                if let _ = $0 as? SplashViewController {
+                    newStack.append(SplashViewController())
+                } else {
+                    newStack.append($0)
+                }
+            })
+            DispatchQueue.main.async { [weak self] in
+                self?.navigationController?.viewControllers = newStack
+                self?.navigationController?.popToRootViewController(animated: true)
+            }
+        }
     }
 }

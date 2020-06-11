@@ -43,6 +43,10 @@ import Foundation
 enum BackupWalletError: Error {
     case noAnyBackups
     case unzipError
+    case dbFileNotFound
+    case iCloudContainerNotFound
+    case unableCreateBackupFolder
+    case privateKeyError
 }
 
 extension BackupWalletError: LocalizedError {
@@ -51,7 +55,15 @@ extension BackupWalletError: LocalizedError {
         case .noAnyBackups:
             return NSLocalizedString("You have not any wallet backup", comment: "'No any wallet backup' error description")
         case .unzipError:
-            return NSLocalizedString("Can't unarchive wallet from iCloud beckup", comment: "unarchive wallet error description")
+            return NSLocalizedString("Unable unarchive wallet from iCloud beckup", comment: "unarchive wallet error description")
+        case .dbFileNotFound:
+            return NSLocalizedString("Unable create wallet backup. File not found", comment: "sqlite file not found error description")
+        case .iCloudContainerNotFound:
+            return NSLocalizedString("Unable create wallet backup. iCloud container not found", comment: "iCloud container not found error description")
+        case .unableCreateBackupFolder:
+            return NSLocalizedString("Unable create backup folder", comment: "Unable create backup folder error descroption")
+        case .privateKeyError:
+            return NSLocalizedString("Unable restore wallet. Private key error", comment: "Unable restore wallet private key error descroption")
         }
 
     }
@@ -66,7 +78,6 @@ class Backup: NSObject {
     var query: NSMetadataQuery!
 
     private let containerIdentifier = "iCloud.com.tari.wallet"
-    private let backupFolder = TariLib.shared.tariWallet?.publicKey.0?.hex.0
     private let directory = TariLib.shared.databaseDirectory
     private let fileName = TariLib.databaseName
 
@@ -97,7 +108,7 @@ class Backup: NSObject {
     // returns true if backup of current wallet is exist
     func isBackupExist() -> Bool {
         let fileManager = FileManager.default
-        guard let backupFolder = backupFolder else { return false }
+        guard let backupFolder = TariLib.shared.tariWallet?.publicKey.0?.hex.0 else { return false }
         if let icloudFolderURL = fileManager.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(backupFolder),
             let urls = try? fileManager.contentsOfDirectory(at: icloudFolderURL, includingPropertiesForKeys: nil, options: []) {
             if let _ = urls.first(where: { $0.absoluteString.contains(backupFolder) }) {
@@ -108,11 +119,14 @@ class Backup: NSObject {
     }
 
     func createWalletBackup() throws {
-        guard
-            let fileURL = try zipBackupFiles(),
-            let backupFolder = backupFolder,
-            let containerURL = FileManager.default.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(backupFolder)
-            else { return }
+        guard let backupFolder = TariLib.shared.tariWallet?.publicKey.0?.hex.0 else {
+            throw BackupWalletError.unableCreateBackupFolder
+        }
+        guard let containerURL = FileManager.default.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent(backupFolder) else {
+            throw BackupWalletError.iCloudContainerNotFound
+        }
+
+        let fileURL = try zipBackupFiles()
 
         if !FileManager.default.fileExists(atPath: containerURL.path) {
             try FileManager.default.createDirectory(at: containerURL, withIntermediateDirectories: true, attributes: nil)
@@ -132,15 +146,36 @@ class Backup: NSObject {
     }
 
     func restoreWallet(completion: (_ success: Bool) -> Void) throws {
+        Keychain.logout()
         let wallets = existsWallets()
+        let dbDirectory = TariLib.shared.databaseDirectory
+        try FileManager.default.createDirectory(at: dbDirectory, withIntermediateDirectories: true, attributes: nil)
 
-        guard
-            let firstWallet = wallets.first,
-            let dbDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-            else { throw BackupWalletError.noAnyBackups }
+        guard let firstWallet = wallets.first//,
+        else { throw BackupWalletError.noAnyBackups }
 
         do {
             try Backup.shared.restoreBackup(walletFolder: firstWallet, to: dbDirectory) { (success) in
+
+                let privateKey = PrivateKey()
+
+                let (privateKeyHex, hexError) = privateKey.hex
+                if hexError != nil {
+                    completion(false)
+                    UserFeedback.shared.error(title: NSLocalizedString("Failed to restore wallet", comment: "Restore wallet failture"), description: "", error: BackupWalletError.privateKeyError)
+                    try? FileManager.default.removeItem(at: dbDirectory)
+                    return
+                }
+
+                //Save to keychain and then ensure it's there (If one exists already in the keychain this will overwrite it)
+                TariLib.shared.storedPrivateKey = privateKeyHex
+                guard TariLib.shared.storedPrivateKey != nil else {
+                    TariLogger.error("Failed to save private key to keychain")
+                    try? FileManager.default.removeItem(at: dbDirectory)
+                    completion(false)
+                    UserFeedback.shared.error(title: NSLocalizedString("Failed to restore wallet", comment: "Restore wallet failture"), description: "", error: BackupWalletError.privateKeyError)
+                    return
+                }
                 completion(success)
             }
         } catch {
@@ -270,15 +305,24 @@ extension Backup {
         }
     }
 
-    private func zipBackupFiles() throws -> URL? {
+    private func zipBackupFiles() throws -> URL {
         guard let archiveURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(fileName) else {
-            return nil
+            throw BackupWalletError.dbFileNotFound
         }
-        do {
-            try FileManager().zipItem(at: directory, to: archiveURL)
-            return archiveURL
-        } catch {
-            throw error
+        if let enumerator: FileManager.DirectoryEnumerator = FileManager.default.enumerator(atPath: directory.path) {
+            guard
+                let files = enumerator.allObjects as? [String],
+                let sqlite3File = files.first(where: { $0.hasSuffix(".sqlite3")})
+            else {
+                throw BackupWalletError.dbFileNotFound
+            }
+            do {
+                try FileManager().zipItem(at: directory.appendingPathComponent(sqlite3File), to: archiveURL)
+                return archiveURL
+            } catch {
+                throw error
+            }
         }
+        throw BackupWalletError.dbFileNotFound
     }
 }

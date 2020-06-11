@@ -39,6 +39,7 @@
 */
 
 import UIKit
+import LocalAuthentication
 
 class BackUpWalletSettings: SettingsParentTableViewController {
 
@@ -81,13 +82,17 @@ class BackUpWalletSettings: SettingsParentTableViewController {
     }
 
     private func onBackUpToiCloudAction() {
-        do {
-            try backup.createWalletBackup()
-            iCloudBackUpItem.mark = .progress
-        } catch {
-            UserFeedback.shared.error(title: NSLocalizedString("Failed to create backup", comment: "Backup wallet settings"), description: "", error: error)
-            iCloudBackUpItem.mark = .attention
+        let localAuth = LAContext()
+        localAuth.authenticateUser(reason: .userVerification) { [weak self] in
+            do {
+                try self?.backup.createWalletBackup()
+                self?.iCloudBackUpItem.mark = .progress
+            } catch {
+                UserFeedback.shared.error(title: NSLocalizedString("Failed to create backup", comment: "Backup wallet settings"), description: "", error: error)
+                self?.iCloudBackUpItem.mark = .attention
+            }
         }
+
     }
 
     private func onBackUpWithRecoveryPhraseAction() {

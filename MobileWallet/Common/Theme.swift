@@ -215,6 +215,12 @@ struct Colors: Loopable {
     //Refresh view
     let refreshViewLabelLoading = UIColor(named: "RefreshViewLabelLoading")
     let refreshViewLabelSuccess = UIColor(named: "RefreshViewLabelSuccess")
+
+    //Restore pending view
+    let restorePendingViewTitle = UIColor(named: "RestorePendingViewTitle")
+    let restorePendingViewDescription = UIColor(named: "RestorePendingViewDescription")
+    let restorePendingViewProgressView = UIColor(named: "RestorePendingViewProgressView")
+
 }
 
 struct Fonts: Loopable {
@@ -323,6 +329,9 @@ struct Fonts: Loopable {
     //App table view
     let appTableViewCell = UIFont(name: "Avenir-Medium", size: 15)
 
+    //Restore pending view
+    let restorePendingViewTitle = UIFont(name: "Avenir-Light", size: 18)
+    let restorePendingViewDescription = UIFont(name: "Avenir-Medium", size: 14)
 }
 
 struct Images: Loopable {
@@ -358,6 +367,7 @@ struct Images: Loopable {
     let handWave = UIImage(named: "HandWave")
     let attention = UIImage(named: "Attention")
     let success = UIImage(named: "Success")
+    let tariIcon = UIImage(named: "TariIcon")
 
     //Amount
     let delete = UIImage(named: "numpad-delete")
