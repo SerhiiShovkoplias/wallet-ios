@@ -68,7 +68,6 @@ extension BackupWalletError: LocalizedError {
         case .privateKeyError:
             return NSLocalizedString("Unable restore wallet. Private key error", comment: "Unable restore wallet private key error descroption")
         }
-
     }
 }
 
@@ -180,6 +179,8 @@ class Backup: NSObject {
                 completion(success)
             }
         } catch {
+            try FileManager.default.removeItem(at: dbDirectory)
+            completion(false)
             throw error
         }
     }
