@@ -148,11 +148,11 @@ class Backup: NSObject {
     func restoreWallet(completion: (_ success: Bool) -> Void) throws {
         Keychain.logout()
         let wallets = existsWallets()
+
+        guard let firstWallet = wallets.first else { completion(false); throw BackupWalletError.noAnyBackups }
+
         let dbDirectory = TariLib.shared.databaseDirectory
         try FileManager.default.createDirectory(at: dbDirectory, withIntermediateDirectories: true, attributes: nil)
-
-        guard let firstWallet = wallets.first//,
-        else { throw BackupWalletError.noAnyBackups }
 
         do {
             try Backup.shared.restoreBackup(walletFolder: firstWallet, to: dbDirectory) { (success) in
