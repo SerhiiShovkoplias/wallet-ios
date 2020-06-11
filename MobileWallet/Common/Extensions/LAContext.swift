@@ -91,7 +91,6 @@ extension LAContext {
                 [weak self] success, error in
 
                 DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
                     if success {
                         onSuccess()
                     } else {
