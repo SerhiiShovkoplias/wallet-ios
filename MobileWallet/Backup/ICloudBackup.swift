@@ -40,7 +40,7 @@
 
 import Foundation
 
-enum BackupWalletError: Error {
+enum ICloudBackupWalletError: Error {
     case failedToCreateArchive
     case noAnyBackups
     case unzipError
@@ -50,7 +50,7 @@ enum BackupWalletError: Error {
     case privateKeyError
 }
 
-extension BackupWalletError: LocalizedError {
+extension ICloudBackupWalletError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .failedToCreateArchive:
@@ -58,36 +58,36 @@ extension BackupWalletError: LocalizedError {
         case .noAnyBackups:
             return NSLocalizedString("You have not any wallet backup", comment: "'No any wallet backup' error description")
         case .unzipError:
-            return NSLocalizedString("Unable unarchive wallet from iCloud beckup", comment: "unarchive wallet error description")
+            return NSLocalizedString("Unable to unarchive wallet from iCloud backup", comment: "unarchive wallet error description")
         case .dbFileNotFound:
-            return NSLocalizedString("Unable create wallet backup. File not found", comment: "sqlite file not found error description")
+            return NSLocalizedString("Unable to create wallet backup. File not found", comment: "sqlite file not found error description")
         case .iCloudContainerNotFound:
-            return NSLocalizedString("Unable create wallet backup. iCloud container not found", comment: "iCloud container not found error description")
+            return NSLocalizedString("Unable to create wallet backup. iCloud container not found", comment: "iCloud container not found error description")
         case .unableCreateBackupFolder:
-            return NSLocalizedString("Unable create backup folder", comment: "Unable create backup folder error descroption")
+            return NSLocalizedString("Unable to create backup folder", comment: "Unable to create backup folder error descroption")
         case .privateKeyError:
-            return NSLocalizedString("Unable restore wallet. Private key error", comment: "Unable restore wallet private key error descroption")
+            return NSLocalizedString("Unable to restore wallet. Private key error", comment: "Unable to restore wallet private key error descroption")
         }
     }
 }
 
-protocol BackupObserver: AnyObject {
+protocol ICloudBackupObserver: AnyObject {
     func didFinishUploadBackup(percent: Double, completed: Bool, error: Error?)
 }
 
-class Backup: NSObject {
+class ICloudBackup: NSObject {
 
     var query: NSMetadataQuery!
 
     private let containerIdentifier = "iCloud.com.tari.wallet"
     private let directory = TariLib.shared.databaseDirectory
-    private let fileName = "tarri-wallet-backup"
+    private let fileName = "tari-wallet-backup"
     private var observers = NSPointerArray.weakObjects()
 
     var inProgress: Bool = false
     private(set) var progressValue: Double = 0.0
 
-    static let shared = Backup()
+    static let shared = ICloudBackup()
 
     override init() {
         super.init()
@@ -102,7 +102,7 @@ class Backup: NSObject {
         query.predicate = NSPredicate(format: "%K LIKE '*.zip'", NSMetadataItemFSNameKey)
     }
 
-    func addObserver(_ observer: BackupObserver) {
+    func addObserver(_ observer: ICloudBackupObserver) {
         observers.addObject(observer)
     }
 
@@ -125,7 +125,7 @@ class Backup: NSObject {
     }
 
     func createWalletBackup() throws {
-        guard let backupFolder = TariLib.shared.tariWallet?.publicKey.0?.hex.0 else { throw BackupWalletError.iCloudContainerNotFound }
+        guard let backupFolder = TariLib.shared.tariWallet?.publicKey.0?.hex.0 else { throw ICloudBackupWalletError.iCloudContainerNotFound }
 
         let fileURL = try zipBackupFiles()
         let containerURL = try iCloudDirectory().appendingPathComponent(backupFolder)
@@ -155,14 +155,15 @@ class Backup: NSObject {
         try FileManager.default.createDirectory(at: dbDirectory, withIntermediateDirectories: true, attributes: nil)
 
         do {
-            try Backup.shared.restoreBackup(walletFolder: firstWallet, to: dbDirectory) { (success) in
+            try ICloudBackup.shared.restoreBackup(walletFolder: firstWallet, to: dbDirectory) { (success) in
 
                 let privateKey = PrivateKey()
 
                 let (privateKeyHex, hexError) = privateKey.hex
+
                 if hexError != nil {
                     completion(false)
-                    UserFeedback.shared.error(title: NSLocalizedString("Failed to restore wallet", comment: "Restore wallet failture"), description: "", error: BackupWalletError.privateKeyError)
+                    UserFeedback.shared.error(title: NSLocalizedString("Failed to restore wallet", comment: "Restore wallet failture"), description: "", error: ICloudBackupWalletError.privateKeyError)
                     try? FileManager.default.removeItem(at: dbDirectory)
                     return
                 }
@@ -173,7 +174,7 @@ class Backup: NSObject {
                     TariLogger.error("Failed to save private key to keychain")
                     try? FileManager.default.removeItem(at: dbDirectory)
                     completion(false)
-                    UserFeedback.shared.error(title: NSLocalizedString("Failed to restore wallet", comment: "Restore wallet failture"), description: "", error: BackupWalletError.privateKeyError)
+                    UserFeedback.shared.error(title: NSLocalizedString("Failed to restore wallet", comment: "Restore wallet failture"), description: "", error: ICloudBackupWalletError.privateKeyError)
                     return
                 }
                 completion(success)
@@ -187,13 +188,13 @@ class Backup: NSObject {
 }
 
 // MARK: - private methods
-extension Backup {
+extension ICloudBackup {
     private func restoreBackup(walletFolder: String, to directory: URL, completion:((_ success: Bool) -> Void)) throws {
         downloadBackup(walletFolder: walletFolder) { [weak self] in
             guard let zippedBackup = $0,
                 ((try? self?.unzipBackup(url: zippedBackup, to: directory)) != nil) else {
                     completion(false)
-                    throw BackupWalletError.unzipError
+                    throw ICloudBackupWalletError.unzipError
             }
             completion(true)
         }
@@ -241,7 +242,7 @@ extension Backup {
             }
         })
         if wallets.isEmpty {
-            throw BackupWalletError.noAnyBackups
+            throw ICloudBackupWalletError.noAnyBackups
         }
         return wallets
     }
@@ -294,7 +295,7 @@ extension Backup {
 
     private func notifyObservers(percent: Double, completed: Bool, error: Error?) {
         observers.allObjects.forEach {
-            if let object = $0 as? BackupObserver {
+            if let object = $0 as? ICloudBackupObserver {
                 object.didFinishUploadBackup(percent: percent, completed: completed, error: error)
             }
         }
@@ -322,7 +323,7 @@ extension Backup {
                 let files = enumerator.allObjects as? [String],
                 let sqlite3File = files.first(where: { $0.hasSuffix(".sqlite3")})
                 else {
-                    throw BackupWalletError.dbFileNotFound
+                    throw ICloudBackupWalletError.dbFileNotFound
             }
             do {
                 try FileManager().zipItem(at: directory.appendingPathComponent(sqlite3File), to: archiveURL)
@@ -331,12 +332,12 @@ extension Backup {
                 throw error
             }
         }
-        throw BackupWalletError.dbFileNotFound
+        throw ICloudBackupWalletError.dbFileNotFound
     }
 
     private func iCloudDirectory() throws -> URL {
         guard let url = FileManager.default.url(forUbiquityContainerIdentifier: containerIdentifier)?.appendingPathComponent("Tari-Wallet-Backups") else {
-            throw BackupWalletError.iCloudContainerNotFound
+            throw ICloudBackupWalletError.iCloudContainerNotFound
         }
         return url
     }
@@ -349,7 +350,7 @@ extension Backup {
             }
 
             return tempZipDirectory
-        } else { throw BackupWalletError.failedToCreateArchive }
+        } else { throw ICloudBackupWalletError.failedToCreateArchive }
     }
 
     private func cleanTempDirectory() throws {

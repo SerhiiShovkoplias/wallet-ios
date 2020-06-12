@@ -43,8 +43,8 @@ import LocalAuthentication
 
 class BackUpWalletSettings: SettingsParentTableViewController {
 
-    private lazy var backup: Backup = {
-        let backup = Backup.shared
+    private lazy var iCloudBackup: ICloudBackup = {
+        let backup = ICloudBackup.shared
         backup.addObserver(self)
         return backup
     }()
@@ -85,7 +85,7 @@ class BackUpWalletSettings: SettingsParentTableViewController {
         let localAuth = LAContext()
         localAuth.authenticateUser(reason: .userVerification) { [weak self] in
             do {
-                try self?.backup.createWalletBackup()
+                try self?.iCloudBackup.createWalletBackup()
                 self?.iCloudBackUpItem.mark = .progress
             } catch {
                 UserFeedback.shared.error(title: NSLocalizedString("Failed to create backup", comment: "Backup wallet settings"), description: "", error: error)
@@ -100,17 +100,17 @@ class BackUpWalletSettings: SettingsParentTableViewController {
     }
 
     @objc private func updateMarks() {
-        if backup.inProgress {
+        if iCloudBackup.inProgress {
             iCloudBackUpItem.mark = .progress
-            iCloudBackUpItem.percent = backup.progressValue
+            iCloudBackUpItem.percent = iCloudBackup.progressValue
             return
         }
 
-        iCloudBackUpItem.mark = backup.isBackupExist() ? .success : .attention
+        iCloudBackUpItem.mark = iCloudBackup.isBackupExist() ? .success : .attention
     }
 }
 
-extension BackUpWalletSettings: BackupObserver {
+extension BackUpWalletSettings: ICloudBackupObserver {
     func didFinishUploadBackup(percent: Double, completed: Bool, error: Error?) {
         if error != nil {
             UserFeedback.shared.error(title: NSLocalizedString("Failed to create backup", comment: "Backup wallet settings"), description: "", error: error)

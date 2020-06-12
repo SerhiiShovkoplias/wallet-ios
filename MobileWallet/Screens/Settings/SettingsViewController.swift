@@ -115,7 +115,7 @@ class SettingsViewController: SettingsParentTableViewController {
     }
 
     @objc private func updateMarks() {
-        backUpWalletItem.mark = Backup.shared.isBackupExist() ? .success : .attention
+        backUpWalletItem.mark = ICloudBackup.shared.isBackupExist() ? .success : .attention
     }
 }
 

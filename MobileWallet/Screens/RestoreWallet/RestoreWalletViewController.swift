@@ -103,7 +103,7 @@ extension RestoreWalletViewController: UITableViewDelegate, UITableViewDataSourc
         locatAuth.authenticateUser(reason: .userVerification) { [weak self] in
             self?.pendingView.showPendingView {
                 do {
-                    try Backup.shared.restoreWallet(completion: {(success) in
+                    try ICloudBackup.shared.restoreWallet(completion: {(success) in
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
                             self?.pendingView.hidePendingView { [weak self] in
                                 if success {
