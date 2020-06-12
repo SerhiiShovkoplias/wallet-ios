@@ -312,6 +312,8 @@ extension ICloudBackup {
     private func zipBackupFiles() throws -> URL {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm"
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+
         let dateString = dateFormatter.string(from: Date())
         let archiveName = "\(dateString) \(fileName).zip"
 
