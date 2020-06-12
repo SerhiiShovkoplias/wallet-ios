@@ -103,17 +103,17 @@ extension RestoreWalletViewController: UITableViewDelegate, UITableViewDataSourc
         locatAuth.authenticateUser(reason: .userVerification) { [weak self] in
             self?.pendingView.showPendingView {
                 do {
-                    try ICloudBackup.shared.restoreWallet(completion: {(success) in
+                    try ICloudBackup.shared.restoreWallet(completion: {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
                             self?.pendingView.hidePendingView { [weak self] in
-                                if success {
-                                    UserDefaults.standard.set(true, forKey: "authStepPassed")
-                                    self?.returnToSplashScreen()
-                                }
+                                UserDefaults.standard.set(true, forKey: HomeViewController.INTRO_TO_WALLET_USER_DEFAULTS_KEY)
+                                UserDefaults.standard.set(true, forKey: "authStepPassed")
+                                self?.returnToSplashScreen()
                             }
                         }
                     })
                 } catch {
+                    self?.pendingView.hidePendingView()
                     UserFeedback.shared.error(title: NSLocalizedString("Failed to restore wallet", comment: "Restore wallet failture"), description: "", error: error)
                 }
             }

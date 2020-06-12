@@ -53,7 +53,7 @@ class RestoreWalletPendingView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func showPendingView(completion: (() -> Void)?) {
+    func showPendingView(completion: (() -> Void)? = nil) {
         isHidden = false
         UIView.animate(withDuration: CATransaction.animationDuration(), animations: { [weak self] in
             self?.alpha = 1.0
@@ -62,7 +62,7 @@ class RestoreWalletPendingView: UIView {
         }
     }
 
-    func hidePendingView(completion: (() -> Void)?) {
+    func hidePendingView(completion: (() -> Void)? = nil) {
         UIView.animate(withDuration: CATransaction.animationDuration(), animations: { [weak self] in
             self?.alpha = 0.0
         }) { [weak self] (_) in
