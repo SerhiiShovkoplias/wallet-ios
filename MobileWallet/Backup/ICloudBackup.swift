@@ -313,7 +313,7 @@ extension ICloudBackup {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm"
         let dateString = dateFormatter.string(from: Date())
-        let archiveName = "\(dateString)-\(fileName).zip"
+        let archiveName = "\(dateString) \(fileName).zip"
 
         let tempDirectory = try tempZipDirectory()
         let archiveURL = tempDirectory.appendingPathComponent(archiveName)
