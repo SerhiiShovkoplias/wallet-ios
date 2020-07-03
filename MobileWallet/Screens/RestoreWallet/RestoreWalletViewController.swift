@@ -42,7 +42,8 @@ import UIKit
 import LocalAuthentication
 
 class RestoreWalletViewController: UIViewController {
-    private let pendingView = RestoreWalletPendingView()
+    private let pendingView = PendingView(title: NSLocalizedString("restore_pending_view.title", comment: "RestorePending view"), definition: NSLocalizedString("restore_pending_view.description", comment: "RestorePending view"))
+
     private let tableView = UITableView()
     private let items: [SystemMenuTableViewCellItem] = [
         SystemMenuTableViewCellItem(title: RestoreCellTitle.iCloudRestore.rawValue)]
@@ -103,7 +104,7 @@ extension RestoreWalletViewController: UITableViewDelegate, UITableViewDataSourc
                 ICloudBackup.shared.restoreWallet(completion: { [weak self] error in
 
                     if error != nil {
-                        UserFeedback.shared.error(title: NSLocalizedString("iCloud_backup.error.restore_wallet.title", comment: "RestoreWallet view"), description: error?.localizedDescription ?? "", error: nil) { [weak self] in
+                        UserFeedback.shared.error(title: NSLocalizedString("iCloud_backup.error.title.restore_wallet", comment: "RestoreWallet view"), description: error?.localizedDescription ?? "", error: nil) { [weak self] in
                             self?.pendingView.hidePendingView()
                         }
                         return
@@ -113,6 +114,7 @@ extension RestoreWalletViewController: UITableViewDelegate, UITableViewDataSourc
                         self?.pendingView.hidePendingView { [weak self] in
                             UserDefaults.standard.set(true, forKey: HomeViewController.INTRO_TO_WALLET_USER_DEFAULTS_KEY)
                             UserDefaults.standard.set(true, forKey: "authStepPassed")
+                            UserDefaults.standard.set(true, forKey: "iCloudBackupsSwitcherIsOn")
                             self?.returnToSplashScreen()
                         }
                     }
@@ -133,7 +135,6 @@ extension RestoreWalletViewController {
         navigationBar.backgroundColor = Theme.shared.colors.settingsTableStyleBackground
         setupNavigationBar()
         setupTableView()
-        setupPendingView()
     }
 
     private func setupNavigationBar() {
@@ -163,18 +164,6 @@ extension RestoreWalletViewController {
         tableView.heightAnchor.constraint(equalToConstant: 128).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-    }
-
-    private func setupPendingView() {
-        view.addSubview(pendingView)
-        pendingView.alpha = 0.0
-        pendingView.isHidden = true
-
-        pendingView.translatesAutoresizingMaskIntoConstraints = false
-        pendingView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        pendingView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        pendingView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        pendingView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
 
     private func returnToSplashScreen() {
