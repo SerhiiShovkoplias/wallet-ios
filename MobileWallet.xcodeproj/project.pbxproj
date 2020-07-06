@@ -397,6 +397,9 @@
 		37B444A9248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
 		37B444AA248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
 		37B444AB248949B800592D92 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B444A8248949B800592D92 /* Checkbox.swift */; };
+		37B48A7F24B3312000F8A8D2 /* PasswordVerificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B48A7E24B3312000F8A8D2 /* PasswordVerificationViewController.swift */; };
+		37B48A8024B3312000F8A8D2 /* PasswordVerificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B48A7E24B3312000F8A8D2 /* PasswordVerificationViewController.swift */; };
+		37B48A8124B3312000F8A8D2 /* PasswordVerificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B48A7E24B3312000F8A8D2 /* PasswordVerificationViewController.swift */; };
 		37BB696B245705D20013AC4D /* RadialGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BB696A245705D20013AC4D /* RadialGradientView.swift */; };
 		37BB696C245705E60013AC4D /* RadialGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BB696A245705D20013AC4D /* RadialGradientView.swift */; };
 		37BB696D245705E70013AC4D /* RadialGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BB696A245705D20013AC4D /* RadialGradientView.swift */; };
@@ -736,6 +739,7 @@
 		37AFE264245193CA006EA270 /* AlwaysPoppableNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlwaysPoppableNavigationController.swift; sourceTree = "<group>"; };
 		37B4449D24890F6200592D92 /* ICloudBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudBackup.swift; sourceTree = "<group>"; };
 		37B444A8248949B800592D92 /* Checkbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checkbox.swift; sourceTree = "<group>"; };
+		37B48A7E24B3312000F8A8D2 /* PasswordVerificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordVerificationViewController.swift; sourceTree = "<group>"; };
 		37BB696A245705D20013AC4D /* RadialGradientView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadialGradientView.swift; sourceTree = "<group>"; };
 		37BB6973245726FB0013AC4D /* CopyableLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CopyableLabel.swift; sourceTree = "<group>"; };
 		37C8BA342480F59B005BBC05 /* WaveEmojiAnimation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = WaveEmojiAnimation.json; sourceTree = "<group>"; };
@@ -1386,6 +1390,7 @@
 		37B48A7C24B31AE800F8A8D2 /* PasswordVerification */ = {
 			isa = PBXGroup;
 			children = (
+				37B48A7E24B3312000F8A8D2 /* PasswordVerificationViewController.swift */,
 			);
 			path = PasswordVerification;
 			sourceTree = "<group>";
@@ -2124,6 +2129,7 @@
 				BFD758E623E98ABD00B0F1A5 /* ProfileViewController.swift in Sources */,
 				BFC5532523D9B8E4009130A8 /* UIView.swift in Sources */,
 				00BCE489240EB1EE00B181F3 /* SplashViewControllerSetup.swift in Sources */,
+				37B48A7F24B3312000F8A8D2 /* PasswordVerificationViewController.swift in Sources */,
 				006D211D23CEDF16007D1C10 /* MicroTari.swift in Sources */,
 				00BBD812237E9EE200EBF5E6 /* PrivateKey.swift in Sources */,
 				009DFCA72473E33F0061DBC9 /* DeepLinkParams.swift in Sources */,
@@ -2233,6 +2239,7 @@
 				00A66524243B3E380046E730 /* ErrorView.swift in Sources */,
 				37C8BA4C24813F33005BBC05 /* SeedPhraseViewController.swift in Sources */,
 				37547D532460165500EB59CC /* UIApplication+KeyWindow.swift in Sources */,
+				37B48A8024B3312000F8A8D2 /* PasswordVerificationViewController.swift in Sources */,
 				0053873124065F6C00901A68 /* SlideView.swift in Sources */,
 				BFE61E4924226A7E003DC99D /* NotificationManager.swift in Sources */,
 				37049271247EA0770034EE5D /* RestoreWalletViewController.swift in Sources */,
@@ -2388,6 +2395,7 @@
 				37765D2824A35BA20091AE2A /* AESEncryption.swift in Sources */,
 				491AB8A223F3FF4400372189 /* AddAmountViewController.swift in Sources */,
 				BFAB5D1323FDEA6A009E8563 /* EmoticonView.swift in Sources */,
+				37B48A8124B3312000F8A8D2 /* PasswordVerificationViewController.swift in Sources */,
 				37EE285C2485649800335EDC /* WordsFlexView.swift in Sources */,
 				BFF1ED9F2408111000CC9EF6 /* SendingTariViewController.swift in Sources */,
 				379D27BB244F091B00F1AD98 /* NavigationBarWithSubtitle.swift in Sources */,

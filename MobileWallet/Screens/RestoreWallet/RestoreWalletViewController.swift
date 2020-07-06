@@ -43,7 +43,6 @@ import LocalAuthentication
 
 class RestoreWalletViewController: SettingsParentTableViewController {
     private let pendingView = PendingView(title: NSLocalizedString("restore_pending_view.title", comment: "RestorePending view"), definition: NSLocalizedString("restore_pending_view.description", comment: "RestorePending view"))
-
     private let items: [SystemMenuTableViewCellItem] = [
         SystemMenuTableViewCellItem(title: RestoreCellTitle.iCloudRestore.rawValue)]
     // SystemMenuTableViewCellItem(title: RestoreCellTitle.phraseRestore.rawValue)]
@@ -106,25 +105,10 @@ extension RestoreWalletViewController: UITableViewDelegate, UITableViewDataSourc
     private func oniCloudRestoreAction() {
         let locatAuth = LAContext()
         locatAuth.authenticateUser(reason: .userVerification) { [weak self] in
-            self?.pendingView.showPendingView {
-                ICloudBackup.shared.restoreWallet(completion: { [weak self] error in
-
-                    if error != nil {
-                        UserFeedback.shared.error(title: NSLocalizedString("iCloud_backup.error.title.restore_wallet", comment: "RestoreWallet view"), description: error?.localizedDescription ?? "", error: nil) { [weak self] in
-                            self?.pendingView.hidePendingView()
-                        }
-                        return
-                    }
-
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-                        self?.pendingView.hidePendingView { [weak self] in
-                            UserDefaults.standard.set(true, forKey: HomeViewController.INTRO_TO_WALLET_USER_DEFAULTS_KEY)
-                            UserDefaults.standard.set(true, forKey: "authStepPassed")
-                            UserDefaults.standard.set(true, forKey: "iCloudBackupsSwitcherIsOn")
-                            self?.returnToSplashScreen()
-                        }
-                    }
-                })
+            if self?.iCloudBackup.isLastBackupEncrypted == true {
+                self?.navigationController?.pushViewController(PasswordVerificationViewController(variation: .restore, restoreWalletAction: self?.restoreWallet(password:)), animated: true)
+            } else {
+                self?.restoreWallet(password: nil)
             }
         }
     }
@@ -132,18 +116,25 @@ extension RestoreWalletViewController: UITableViewDelegate, UITableViewDataSourc
     private func onPhraseRestoreAction() {
 
     }
-}
 
-// MARK: Setup subviews
-extension RestoreWalletViewController {
-    override func setupNavigationBar() {
-        super.setupNavigationBar()
-        navigationBar.backgroundColor = .clear
-        navigationBar.title = NSLocalizedString("restore_wallet.title", comment: "RestoreWallet view")
-    }
+    private func restoreWallet(password: String?) {
+        pendingView.showPendingView { [weak self] in
+            ICloudBackup.shared.restoreWallet(password: password, completion: { [weak self] error in
 
-    override func setupNavigationBarSeparator() {
-        return
+                if error != nil {
+                    UserFeedback.shared.error(title: NSLocalizedString("iCloud_backup.error.title.restore_wallet", comment: "RestoreWallet view"), description: error?.localizedDescription ?? "", error: nil) { [weak self] in
+                        self?.pendingView.hidePendingView()
+                    }
+                    return
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                    self?.pendingView.hidePendingView { [weak self] in
+                        self?.returnToSplashScreen()
+                    }
+                }
+            })
+        }
     }
 
     private func returnToSplashScreen() {
@@ -161,5 +152,18 @@ extension RestoreWalletViewController {
                 self?.navigationController?.popToRootViewController(animated: true)
             }
         }
+    }
+}
+
+// MARK: Setup subviews
+extension RestoreWalletViewController {
+    override func setupNavigationBar() {
+        super.setupNavigationBar()
+        navigationBar.backgroundColor = .clear
+        navigationBar.title = NSLocalizedString("restore_wallet.title", comment: "RestoreWallet view")
+    }
+
+    override func setupNavigationBarSeparator() {
+        return
     }
 }

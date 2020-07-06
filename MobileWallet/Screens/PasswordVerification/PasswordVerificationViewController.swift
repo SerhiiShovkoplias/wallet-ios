@@ -1,8 +1,8 @@
-//  SecureBackupViewController.swift
+//  PasswordVerificationViewController.swift
 
 /*
 	Package MobileWallet
-	Created by S.Shovkoplyas on 01.07.2020
+	Created by S.Shovkoplyas on 06.07.2020
 	Using Swift 5.0
 	Running on macOS 10.15
 
@@ -38,23 +38,36 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import Foundation
 import UIKit
 
-class SecureBackupViewController: SettingsParentViewController {
+class PasswordVerificationViewController: SettingsParentViewController {
+    enum PasswordVerificationScreenStyle {
+        case restore
+        case change
+    }
+
+    private let variation: PasswordVerificationScreenStyle
+
     private let scrollView = UIScrollView()
     private let stackView = UIStackView()
     private let headerLabel = UILabel()
     private let descriptionLabel = UILabel()
     private let continueButton = ActionButton()
 
-    private let enterPasswordField = PasswordField()
-    private let confirmPasswordField = PasswordField()
+    private let passwordField = PasswordField()
+    private let restoreWalletAction: ((_ password: String?) -> Void)?
 
     private var secureButtonBottomConstraint: NSLayoutConstraint?
 
-    private let pendingView = PendingView(title: NSLocalizedString("backup_pending_view.title", comment: "BackupPending view"), definition: NSLocalizedString("backup_pending_view.description", comment: "BackupPending view"))
-    private var pendingViewTimer: Timer?
+    init(variation: PasswordVerificationScreenStyle, restoreWalletAction:((_ password: String?) -> Void)? = nil) {
+        self.variation = variation
+        self.restoreWalletAction = restoreWalletAction
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,122 +76,67 @@ class SecureBackupViewController: SettingsParentViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardChangePosition), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 
+    private func changePasswordAction() {
+        if let currentPassword = Migrations.loadBackupPasswordFromKeychain() {
+            if passwordField.comparePassword(currentPassword) {
+                navigationController?.pushViewController(SecureBackupViewController(), animated: true)
+            }
+        }
+    }
+
     @objc private func continueButtonAction() {
         view.endEditing(true)
-        continueButton.variation = .disabled
-        pendingView.showPendingView { [weak self] in
-            guard
-                let self = self,
-                let password = self.enterPasswordField.password
-                else { return }
-            self.isModalInPresentation = true
-            do {
-                try self.iCloudBackup.createWalletBackup(password: password)
-
-                self.pendingViewTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { (_) in
-                    if !self.iCloudBackup.inProgress {
-                        self.finishPendingProcess()
-                    }
-                }
-                Migrations.setBackupPasswordToKeychain(password: password)
-            } catch {
-                self.failedToCreateBackup(error: error)
-            }
-        }
-    }
-
-    override func failedToCreateBackup(error: Error) {
-        super.failedToCreateBackup(error: error)
-        finishPendingProcess()
-    }
-
-    private func finishPendingProcess() {
-        pendingViewTimer?.invalidate()
-        pendingView.hidePendingView(completion: { [weak self] in
-            self?.isModalInPresentation = false
-            self?.navigationController?.popViewController(animated: true)
-        })
-    }
-}
-
-// MARK: Keyboard behavior
-extension SecureBackupViewController {
-    @objc private func keyboardChangePosition(notification: NSNotification) {
-        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            let showKeyboard = notification.name == UIResponder.keyboardWillShowNotification
-            let keyboardHeight = keyboardSize.height
-            secureButtonBottomConstraint?.constant = showKeyboard == true ? -10 - keyboardHeight : -20
-            UIView.animate(withDuration: CATransaction.animationDuration()) { [weak self] in
-                self?.view.layoutIfNeeded()
-            }
-
-            UIView.animate(withDuration: CATransaction.animationDuration(), animations: { [weak self] in
-                self?.view.layoutIfNeeded()
-            }) { [weak self] _ in
-                if showKeyboard == true {
-                    self?.scrollView.scrollsToBottom(animated: true)
-                } else {
-                    self?.scrollView.scrollsToTop(animated: true)
-                }
-            }
+        switch variation {
+        case .restore: restoreWalletAction?(passwordField.password)
+        case .change: changePasswordAction()
         }
     }
 }
 
-// MARK: Setup subviews
-extension SecureBackupViewController {
+extension PasswordVerificationViewController {
     override func setupViews() {
         super.setupViews()
         setupContinueButton()
         setupScrollView()
         setupHeaderLabel()
         setupDescriptionLabel()
-        setupEnterPasswordField()
-        setupConfirmPasswordField()
+        setupPasswordField()
     }
 
     override func setupNavigationBar() {
         super.setupNavigationBar()
-        navigationBar.title = NSLocalizedString("secure_backup.title", comment: "SecureBackup view")
+        navigationBar.backgroundColor = .clear
+        navigationBar.title = NSLocalizedString("password_verification.title", comment: "PasswordVerification view")
     }
 
     private func setupHeaderLabel() {
         headerLabel.font = Theme.shared.fonts.settingsViewHeader
-        headerLabel.text = NSLocalizedString("secure_backup.header", comment: "SecureBackup view")
-
+        switch variation {
+        case .change:
+            headerLabel.text = NSLocalizedString("password_verification.header.enter_current_password", comment: "PasswordVerification view")
+        case .restore:
+            headerLabel.text = NSLocalizedString("password_verification.header.enter_backup_password", comment: "PasswordVerification view")
+        }
         stackView.addArrangedSubview(headerLabel)
         stackView.setCustomSpacing(15, after: headerLabel)
     }
 
-    private func setupEnterPasswordField() {
-        enterPasswordField.delegate = self
-        enterPasswordField.title = NSLocalizedString("secure_backup.enter_password_field.title", comment: "SecureBackup view")
-        enterPasswordField.placeholder = NSLocalizedString("secure_backup.enter_password_field.placeholder", comment: "SecureBackup view")
-        enterPasswordField.paredPasswordField = confirmPasswordField
-
-        stackView.addArrangedSubview(enterPasswordField)
-        stackView.setCustomSpacing(25, after: enterPasswordField)
-    }
-
-    private func setupConfirmPasswordField() {
-        confirmPasswordField.delegate = self
-        confirmPasswordField.warning = NSLocalizedString("secure_backup.password_field_warning", comment: "SecureBackup view")
-        confirmPasswordField.title = NSLocalizedString("secure_backup.confirm_password_field.title", comment: "SecureBackup view")
-        confirmPasswordField.placeholder = NSLocalizedString("secure_backup.confirm_password_field.placeholder", comment: "SecureBackup view")
-        confirmPasswordField.isConfirmationField = true
-        confirmPasswordField.paredPasswordField = enterPasswordField
-        stackView.addArrangedSubview(confirmPasswordField)
-        stackView.setCustomSpacing(25, after: confirmPasswordField)
-    }
-
     private func setupDescriptionLabel() {
-        let atttributedPart1 = NSLocalizedString("secure_backup.header_description_part1", comment: "SecureBackup view")
-        let atttributedPart2 = NSLocalizedString("secure_backup.header_description_part2", comment: "SecureBackup view")
+        let attributedString: NSMutableAttributedString
 
-        let attributedString = NSMutableAttributedString(string: atttributedPart1 + atttributedPart2)
+        switch variation {
+        case .change:
+            attributedString = NSMutableAttributedString(string: NSLocalizedString("password_verification.description.enter_current_password", comment: "PasswordVerification view"))
+            attributedString.addAttributes([NSAttributedString.Key.foregroundColor: Theme.shared.colors.settingsViewDescription!], range: NSRange(location: 0, length: attributedString.length))
+        case .restore:
+            let atttributedPart1 = NSLocalizedString("password_verification.description.enter_backup_password.part1", comment: "PasswordVerification view")
+            let atttributedPart2 = NSLocalizedString("password_verification.description.enter_backup_password.part2", comment: "PasswordVerification view")
+            attributedString = NSMutableAttributedString(string: atttributedPart1 + atttributedPart2)
+            attributedString.addAttributes([NSAttributedString.Key.foregroundColor: Theme.shared.colors.settingsViewDescription!], range: NSRange(location: 0, length: atttributedPart1.count))
+            attributedString.addAttributes([NSAttributedString.Key.foregroundColor: UIColor.black], range: NSRange(location: atttributedPart1.count, length: atttributedPart2.count))
+        }
 
-        attributedString.addAttributes([NSAttributedString.Key.foregroundColor: Theme.shared.colors.settingsViewDescription!], range: NSRange(location: 0, length: atttributedPart1.count))
-        attributedString.addAttributes([NSAttributedString.Key.foregroundColor: UIColor.black], range: NSRange(location: atttributedPart1.count, length: atttributedPart2.count))
+        attributedString.addAttributes([NSAttributedString.Key.kern: -0.26], range: NSRange(location: 0, length: attributedString.length))
 
         descriptionLabel.font = Theme.shared.fonts.settingsViewHeaderDescription
         descriptionLabel.attributedText = attributedString
@@ -186,6 +144,17 @@ extension SecureBackupViewController {
 
         stackView.addArrangedSubview(descriptionLabel)
         stackView.setCustomSpacing(25, after: descriptionLabel)
+    }
+
+    private func setupPasswordField() {
+        passwordField.delegate = self
+        passwordField.isConfirmationField = true
+        passwordField.warning = NSLocalizedString("password_verification.password_field_warning", comment: "PasswordVerification view")
+        passwordField.title = NSLocalizedString("password_verification.password_field.title", comment: "PasswordVerification view")
+        passwordField.placeholder = NSLocalizedString("password_verification.password_field.placeholder", comment: "PasswordVerification view")
+
+        stackView.addArrangedSubview(passwordField)
+        stackView.setCustomSpacing(25, after: passwordField)
     }
 
     private func setupScrollView() {
@@ -214,7 +183,13 @@ extension SecureBackupViewController {
     }
 
     private func setupContinueButton() {
-        continueButton.setTitle(NSLocalizedString("secure_backup.secure_your_backup", comment: "SecureBackup view"), for: .normal)
+        switch variation {
+        case .restore:
+            continueButton.setTitle(NSLocalizedString("password_verification.restore_wallet", comment: "PasswordVerification view"), for: .normal)
+        case .change:
+            continueButton.setTitle(NSLocalizedString("password_verification.change_password", comment: "PasswordVerification view"), for: .normal)
+        }
+
         continueButton.addTarget(self, action: #selector(continueButtonAction), for: .touchUpInside)
         continueButton.variation = .disabled
 
@@ -238,19 +213,43 @@ extension SecureBackupViewController {
     }
 }
 
-extension SecureBackupViewController: PasswordFieldDelegate {
+extension PasswordVerificationViewController: PasswordFieldDelegate {
     func passwordFieldDidChange(_ passwordField: PasswordField) {
         guard let password = passwordField.password else { return }
-        continueButton.variation = (confirmPasswordField.password == enterPasswordField.password && !password.isEmpty) ? .normal : .disabled
+        continueButton.variation = password.isEmpty ? .disabled : .normal
     }
 }
 
-extension SecureBackupViewController: UIScrollViewDelegate {
+extension PasswordVerificationViewController: UIScrollViewDelegate {
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         isModalInPresentation = true // Disabling dismiss controller with swipe down on scroll view
     }
 
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         isModalInPresentation = false
+    }
+}
+
+// MARK: Keyboard behavior
+extension PasswordVerificationViewController {
+    @objc private func keyboardChangePosition(notification: NSNotification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            let showKeyboard = notification.name == UIResponder.keyboardWillShowNotification
+            let keyboardHeight = keyboardSize.height
+            secureButtonBottomConstraint?.constant = showKeyboard == true ? -10 - keyboardHeight : -20
+            UIView.animate(withDuration: CATransaction.animationDuration()) { [weak self] in
+                self?.view.layoutIfNeeded()
+            }
+
+            UIView.animate(withDuration: CATransaction.animationDuration(), animations: { [weak self] in
+                self?.view.layoutIfNeeded()
+            }) { [weak self] _ in
+                if showKeyboard == true {
+                    self?.scrollView.scrollsToBottom(animated: true)
+                } else {
+                    self?.scrollView.scrollsToTop(animated: true)
+                }
+            }
+        }
     }
 }

@@ -40,11 +40,13 @@
 
 import Foundation
 import Reachability
+import ZIPFoundation
 
 enum ICloudBackupWalletError: Error {
     case failedToCreateZip
     case noICloudBackupExists
     case unarchiveError
+    case invalidPassword
     case dbFileNotFound
     case iCloudContainerNotFound
     case unableCreateBackupFolder
@@ -76,6 +78,8 @@ extension ICloudBackupWalletError: LocalizedError {
             return NSLocalizedString("iCloud_backup.error.no_backup_exists", comment: "iCloudBackup error")
         case .unarchiveError:
             return NSLocalizedString("iCloud_backup.error.unzip", comment: "iCloudBackup error")
+        case .invalidPassword:
+            return NSLocalizedString("iCloud_backup.error.invalid_password", comment: "iCloudBackup error")
         case .dbFileNotFound:
             return NSLocalizedString("iCloud_backup.error.db_not_found", comment: "iCloudBackup error")
         case .iCloudContainerNotFound:
@@ -141,13 +145,20 @@ class ICloudBackup: NSObject {
 
     var lastBackupDate: Date? {
         do {
-            guard let backupFolder = TariLib.shared.tariWallet?.publicKey.0?.hex.0 else { return nil }
-            let iCloudFolderURL = try iCloudDirectory().appendingPathComponent(backupFolder)
-            if let last = try FileManager.default.contentsOfDirectory(atURL: iCloudFolderURL, sortedBy: .created, options: []).last {
-                guard let date = try last.resourceValues(forKeys: [.creationDateKey]).allValues.first?.value as? Date else { return nil }
-                return date
-            }
+            guard let date = try getLastWalletBackup().resourceValues(forKeys: [.creationDateKey]).allValues.first?.value as? Date else { return nil }
+            return date
+        } catch {
             return nil
+        }
+    }
+
+    var isLastBackupEncrypted: Bool? {
+        do {
+            if try getLastWalletBackup().absoluteString.contains(".zip") {
+                return false
+            } else {
+                return true
+            }
         } catch {
             return nil
         }
@@ -206,22 +217,18 @@ class ICloudBackup: NSObject {
                 fileURL = try zipWalletDatabase()
             }
 
-            let containerURL = try iCloudDirectory().appendingPathComponent(backupFolder)
+            let walletFolderURL = try iCloudDirectory().appendingPathComponent(backupFolder)
 
-            if !FileManager.default.fileExists(atPath: containerURL.path) {
-                try FileManager.default.createDirectory(at: containerURL, withIntermediateDirectories: true, attributes: nil)
+            if !FileManager.default.fileExists(atPath: walletFolderURL.path) {
+                try FileManager.default.createDirectory(at: walletFolderURL, withIntermediateDirectories: true, attributes: nil)
             }
-            let backupFileURL = containerURL.appendingPathComponent(fileURL.lastPathComponent)
 
-            if FileManager.default.fileExists(atPath: backupFileURL.path) {
-                try FileManager.default.replaceItem(at: backupFileURL,
-                                                    withItemAt: fileURL,
-                                                    backupItemName: fileURL.lastPathComponent,
-                                                    options: .usingNewMetadataOnly,
-                                                    resultingItemURL: nil)
-            } else {
-                try FileManager.default.copyItem(at: fileURL, to: backupFileURL)
+            if let previousBackupURL = try FileManager.default.contentsOfDirectory(atURL: walletFolderURL, sortedBy: .created).last {
+                try FileManager.default.removeItem(at: previousBackupURL)
             }
+
+            try FileManager.default.copyItem(at: fileURL, to: walletFolderURL.appendingPathComponent(fileURL.lastPathComponent))
+
             inProgress = true
             progressValue = 0.0
 
@@ -233,16 +240,29 @@ class ICloudBackup: NSObject {
         }
     }
 
-    func restoreWallet(completion: @escaping (_ error: Error?) -> Void) {
+    func restoreWallet(password: String?, completion: @escaping (_ error: Error?) -> Void) {
         let dbDirectory = TariLib.shared.databaseDirectory
 
         do {
-            let walletFolder = try getLastWalletBackupFolder()
             try FileManager.default.createDirectory(at: dbDirectory, withIntermediateDirectories: true, attributes: nil)
-
-            restoreBackup(walletFolder: walletFolder, to: dbDirectory) { error in
+            restoreBackup(password: password, to: dbDirectory) { error in
                 if error == nil {
                     Migrations.handle()
+
+                    UserDefaults.standard.set(true, forKey: HomeViewController.INTRO_TO_WALLET_USER_DEFAULTS_KEY)
+                    UserDefaults.standard.set(true, forKey: "authStepPassed")
+                    UserDefaults.standard.set(true, forKey: "iCloudBackupsSwitcherIsOn")
+
+                    if password != nil {
+                        Migrations.setBackupPasswordToKeychain(password: password!)
+                    }
+                } else {
+                    do {
+                        try FileManager.default.removeItem(at: dbDirectory)
+                    } catch {
+                        completion(error)
+                        return
+                    }
                 }
                 completion(error)
             }
@@ -362,19 +382,20 @@ extension ICloudBackup {
         }
     }
 
-    private func restoreBackup(walletFolder: String, to directory: URL, completion: @escaping ((_ error: Error?) -> Void)) {
-        downloadBackup(walletFolder: walletFolder) { [weak self] (url, error) in
+    private func restoreBackup(password: String?, to directory: URL, completion: @escaping ((_ error: Error?) -> Void)) {
+        downloadBackup { [weak self] (url, error) in
             guard let backupURL = url, error == nil else {
                 completion(error)
                 return
             }
-
             let isBackupEncrypted = backupURL.pathExtension.isEmpty
-
             let zippedBackupURL: URL
             if isBackupEncrypted {
                 do {
-                    guard let zippedURL = try self?.decryptedZipWalletDatabase(encryptedFileUrl: backupURL) else {
+                    guard
+                        let keyString = password,
+                        let zippedURL = try self?.decryptedZipWalletDatabase(keyString: keyString, encryptedFileUrl: backupURL)
+                    else {
                         completion(ICloudBackupWalletError.unarchiveError)
                         return
                     }
@@ -391,39 +412,28 @@ extension ICloudBackup {
                 try FileManager.default.unzipItem(at: zippedBackupURL, to: directory)
                 completion(nil)
             } catch {
-                completion(error)
+                switch error {
+                case Archive.ArchiveError.unreadableArchive: do {
+                    completion(ICloudBackupWalletError.invalidPassword)
+                    }
+                default: completion(error)
+                }
             }
         }
     }
 
-    private func downloadBackup(walletFolder: String, completion: @escaping ((_ url: URL?, _ error: Error?) -> Void)) {
-        let iCloudFolderURL: URL!
-        var urls = [URL]()
-
+    private func downloadBackup(completion: @escaping ((_ url: URL?, _ error: Error?) -> Void)) {
         do {
-            iCloudFolderURL = try iCloudDirectory().appendingPathComponent(walletFolder)
-            urls = try FileManager.default.contentsOfDirectory(atURL: iCloudFolderURL, sortedBy: .created, options: [])
-        } catch {
-            completion(nil, error)
-        }
-
-        if let backupUrl = urls.last {
+            let backupUrl = try getLastWalletBackup()
             var lastPathComponent = backupUrl.lastPathComponent
             let folderPath = backupUrl.deletingLastPathComponent().path
             // if the last path component contains the “.icloud” extension. If yes the file is not on the device else the file is already downloaded.
-
             if lastPathComponent.contains(".icloud") {
                 if !isInternetConnection() { completion(nil, ICloudBackupWalletError.noInternetConnection) }
 
                 lastPathComponent.removeFirst()
                 let downloadedFilePath = folderPath + "/" + lastPathComponent.replacingOccurrences(of: ".icloud", with: "")
-
-                do {
-                    try FileManager.default.startDownloadingUbiquitousItem(at: backupUrl)
-                } catch {
-                    completion(nil, error)
-                }
-
+                try FileManager.default.startDownloadingUbiquitousItem(at: backupUrl)
                 Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { (timer) in
                     if FileManager.default.fileExists(atPath: downloadedFilePath) {
                         timer.invalidate()
@@ -433,21 +443,23 @@ extension ICloudBackup {
             } else {
                 completion(backupUrl, nil)
             }
+        } catch {
+            completion(nil, error)
         }
     }
 
-    private func getLastWalletBackupFolder() throws -> String {
+    private func getLastWalletBackup() throws -> URL {
         let iCloudFolderURL = try iCloudDirectory()
         do {
-            let urls = try FileManager.default.contentsOfDirectory(atURL: iCloudFolderURL, sortedBy: .created, options: [])
-
-            guard let wallet = urls.last?.lastPathComponent else {
-                throw ICloudBackupWalletError.noICloudBackupExists
+            if let lastWalletFolder = try FileManager.default.contentsOfDirectory(atURL: iCloudFolderURL, sortedBy: .created, options: []).last {
+                if let lastWalletBackup = try FileManager.default.contentsOfDirectory(atURL: lastWalletFolder, sortedBy: .created, options: []).last {
+                    return lastWalletBackup
+                }
             }
-            return wallet
         } catch {
             throw ICloudBackupWalletError.noICloudBackupExists
         }
+        throw ICloudBackupWalletError.noICloudBackupExists
     }
 
     private func zipWalletDatabase() throws -> URL {
@@ -478,10 +490,9 @@ extension ICloudBackup {
         return fileURL
     }
 
-    private func decryptedZipWalletDatabase(encryptedFileUrl: URL) throws -> URL {
-        guard let password = Migrations.loadBackupPasswordFromKeychain() else { throw ICloudBackupWalletError.keychainPasswordFailture }
+    private func decryptedZipWalletDatabase(keyString: String, encryptedFileUrl: URL) throws -> URL {
         let data = try Data(contentsOf: encryptedFileUrl)
-        let aes = try AESEncryption(keyString: password)
+        let aes = try AESEncryption(keyString: keyString)
 
         let decryptedZipUrl = try tempDirectory().appendingPathComponent(fileName + ".zip")
 

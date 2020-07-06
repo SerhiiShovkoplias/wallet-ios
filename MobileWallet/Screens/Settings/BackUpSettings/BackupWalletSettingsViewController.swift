@@ -78,7 +78,7 @@ class BackupWalletSettingsViewController: SettingsParentTableViewController {
             switch self {
             case .iCloudBackups: return NSLocalizedString("backup_wallet_settings.item.icloud_backups", comment: "BackupWalletSettings view")
             case .setupPassword:
-                if Migrations.loadBackupPasswordFromKeychain() != nil {
+                if ICloudBackup.shared.isLastBackupEncrypted == true {
                     return NSLocalizedString("backup_wallet_settings.item.change_password", comment: "BackupWalletSettings view")
                 } else {
                     return NSLocalizedString("backup_wallet_settings.item.secure_your_backup", comment: "BackupWalletSettings view")
@@ -104,7 +104,12 @@ class BackupWalletSettingsViewController: SettingsParentTableViewController {
     }
 
     private func onChangePasswordAction() {
-        navigationController?.pushViewController(SecureBackupViewController(), animated: true)
+        if iCloudBackup.isLastBackupEncrypted == true {
+            navigationController?.pushViewController(PasswordVerificationViewController(variation: .change), animated: true)
+
+        } else {
+            navigationController?.pushViewController(SecureBackupViewController(), animated: true)
+        }
     }
 
     private func onBackupWithRecoveryPhraseAction() {

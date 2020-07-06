@@ -56,6 +56,12 @@ class PasswordField: UIView, UITextFieldDelegate {
         }
     }
 
+    var warning: String? {
+        didSet {
+            warningLabel.text = warning
+        }
+    }
+
     var title: String? {
         didSet {
             titleLabel.text = title
@@ -68,12 +74,12 @@ class PasswordField: UIView, UITextFieldDelegate {
     private let warningLabel = UILabel()
     private let textField = UITextField()
 
-    private enum PasswordFieldState {
+    enum PasswordFieldState {
         case normal
         case warning
     }
 
-    private var state: PasswordFieldState = .normal {
+    private(set) var state: PasswordFieldState = .normal {
         didSet {
             warningLabel.isHidden = state != .warning
             switch state {
@@ -104,14 +110,19 @@ class PasswordField: UIView, UITextFieldDelegate {
     }
 
     func didFinishEditingPassword() {
-        guard
-            let paredPasswordField = self.paredPasswordField,
-            let password = self.password
-        else { return }
-        if paredPasswordField.password != password && !password.isEmpty && isConfirmationField {
+        guard let paredPassword = self.paredPasswordField?.password else { return }
+        _ = comparePassword(paredPassword)
+    }
+
+    func comparePassword(_ password: String) -> Bool {
+        guard let fieldPassword = self.password
+        else { return false }
+        if password != fieldPassword && !fieldPassword.isEmpty && isConfirmationField {
             state = .warning
+            return false
         } else {
             state = .normal
+            return true
         }
     }
 
@@ -167,7 +178,6 @@ class PasswordField: UIView, UITextFieldDelegate {
     private func setupWarningLabel() {
         addSubview(warningLabel)
         warningLabel.isHidden = true
-        warningLabel.text = NSLocalizedString("secure_backup.password_field_warning", comment: "SecureBackup view")
         warningLabel.font = Theme.shared.fonts.settingsPasswordWarning
         warningLabel.textColor = Theme.shared.colors.settingsPasswordWarning
         warningLabel.backgroundColor = backgroundColor
