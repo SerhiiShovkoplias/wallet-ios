@@ -41,10 +41,9 @@
 import UIKit
 import LocalAuthentication
 
-class RestoreWalletViewController: UIViewController {
+class RestoreWalletViewController: SettingsParentTableViewController {
     private let pendingView = PendingView(title: NSLocalizedString("restore_pending_view.title", comment: "RestorePending view"), definition: NSLocalizedString("restore_pending_view.description", comment: "RestorePending view"))
 
-    private let tableView = UITableView()
     private let items: [SystemMenuTableViewCellItem] = [
         SystemMenuTableViewCellItem(title: RestoreCellTitle.iCloudRestore.rawValue)]
     // SystemMenuTableViewCellItem(title: RestoreCellTitle.phraseRestore.rawValue)]
@@ -61,11 +60,10 @@ class RestoreWalletViewController: UIViewController {
         }
     }
 
-    private let navigationBar = NavigationBar()
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupView()
+        tableView.delegate = self
+        tableView.dataSource = self
     }
 }
 
@@ -95,6 +93,14 @@ extension RestoreWalletViewController: UITableViewDelegate, UITableViewDataSourc
         case .iCloudRestore: oniCloudRestoreAction()
         case .phraseRestore: onPhraseRestoreAction()
         }
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let header = UIView()
+        header.backgroundColor = .clear
+
+        header.heightAnchor.constraint(equalToConstant: 15.0).isActive = true
+        return header
     }
 
     private func oniCloudRestoreAction() {
@@ -130,40 +136,14 @@ extension RestoreWalletViewController: UITableViewDelegate, UITableViewDataSourc
 
 // MARK: Setup subviews
 extension RestoreWalletViewController {
-    private func setupView() {
-        view.backgroundColor = Theme.shared.colors.settingsTableStyleBackground
-        navigationBar.backgroundColor = Theme.shared.colors.settingsTableStyleBackground
-        setupNavigationBar()
-        setupTableView()
-    }
-
-    private func setupNavigationBar() {
+    override func setupNavigationBar() {
+        super.setupNavigationBar()
+        navigationBar.backgroundColor = .clear
         navigationBar.title = NSLocalizedString("restore_wallet.title", comment: "RestoreWallet view")
-
-        view.addSubview(navigationBar)
-        navigationBar.translatesAutoresizingMaskIntoConstraints = false
-
-        navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        navigationBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
-        navigationBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        navigationBar.heightAnchor.constraint(equalToConstant: 44).isActive = true
     }
 
-    private func setupTableView() {
-        tableView.register(SystemMenuTableViewCell.self, forCellReuseIdentifier: String(describing: SystemMenuTableViewCell.self))
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.backgroundColor = .clear
-        tableView.isScrollEnabled = false
-        tableView.separatorColor = Theme.shared.colors.settingsTableStyleBackground
-
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-
-        tableView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 25).isActive = true
-        tableView.heightAnchor.constraint(equalToConstant: 128).isActive = true
-        tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
-        tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+    override func setupNavigationBarSeparator() {
+        return
     }
 
     private func returnToSplashScreen() {

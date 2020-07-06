@@ -77,11 +77,13 @@ extension SettingsParentViewController {
     @objc func setupViews() {
         view.backgroundColor = Theme.shared.colors.appBackground
         setupNavigationBar()
+        setupNavigationBarSeparator()
     }
 
     @objc func setupNavigationBar() {
         navigationBar.title = NSLocalizedString("settings.title", comment: "Settings view")
         navigationBar.verticalPositioning = .custom(24)
+        navigationBar.backgroundColor = Theme.shared.colors.navigationBarBackground
 
         view.addSubview(navigationBar)
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
@@ -90,7 +92,9 @@ extension SettingsParentViewController {
         navigationBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         navigationBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
         navigationBar.heightAnchor.constraint(equalToConstant: 58).isActive = true
+    }
 
+    @objc func setupNavigationBarSeparator() {
         let separator = UIView()
         separator.backgroundColor = Theme.shared.colors.settingsNavBarSeparator
 

@@ -1125,6 +1125,8 @@
 		00E2BCAF236B44CE00C2A105 /* UIElements */ = {
 			isa = PBXGroup;
 			children = (
+				37B48A7D24B31C2D00F8A8D2 /* SystemMenuTableViewCell */,
+				37B48A7B24B31AB300F8A8D2 /* PendingView */,
 				3723A7A924ACD029003382EB /* PasswordField */,
 				37B444A72489436100592D92 /* Checkbox */,
 				371A081624728FCB00F97713 /* TransitionUILabel */,
@@ -1156,6 +1158,7 @@
 		00E2BCB5236B469C00C2A105 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				37B48A7C24B31AE800F8A8D2 /* PasswordVerification */,
 				3708D748247FCF0700807D72 /* Settings */,
 				3704926E247EA0580034EE5D /* RestoreWallet */,
 				BFD758E423E98A9F00B0F1A5 /* Profile */,
@@ -1288,8 +1291,6 @@
 			isa = PBXGroup;
 			children = (
 				3704926F247EA0770034EE5D /* RestoreWalletViewController.swift */,
-				37049273247EA9110034EE5D /* SystemMenuTableViewCell.swift */,
-				376B502224924BB700278ACC /* PendingView.swift */,
 			);
 			path = RestoreWallet;
 			sourceTree = "<group>";
@@ -1372,6 +1373,29 @@
 				37B444A8248949B800592D92 /* Checkbox.swift */,
 			);
 			path = Checkbox;
+			sourceTree = "<group>";
+		};
+		37B48A7B24B31AB300F8A8D2 /* PendingView */ = {
+			isa = PBXGroup;
+			children = (
+				376B502224924BB700278ACC /* PendingView.swift */,
+			);
+			path = PendingView;
+			sourceTree = "<group>";
+		};
+		37B48A7C24B31AE800F8A8D2 /* PasswordVerification */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = PasswordVerification;
+			sourceTree = "<group>";
+		};
+		37B48A7D24B31C2D00F8A8D2 /* SystemMenuTableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				37049273247EA9110034EE5D /* SystemMenuTableViewCell.swift */,
+			);
+			path = SystemMenuTableViewCell;
 			sourceTree = "<group>";
 		};
 		37BB6969245705D20013AC4D /* RadialGradientView */ = {
