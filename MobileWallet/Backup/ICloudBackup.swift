@@ -42,7 +42,7 @@ import Foundation
 import Reachability
 import ZIPFoundation
 
-enum ICloudBackupWalletError: Error {
+enum ICloudBackupError: Error {
     case failedToCreateZip
     case noICloudBackupExists
     case unarchiveError
@@ -50,8 +50,8 @@ enum ICloudBackupWalletError: Error {
     case dbFileNotFound
     case iCloudContainerNotFound
     case unableCreateBackupFolder
-    case keychainPasswordFailture
-    case uploadToICloudFailture
+    case keychainPasswordFailure
+    case uploadToICloudFailure
     case noInternetConnection
 }
 
@@ -69,7 +69,7 @@ enum ICloudBackupState {
     }
 }
 
-extension ICloudBackupWalletError: LocalizedError {
+extension ICloudBackupError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .failedToCreateZip:
@@ -86,10 +86,10 @@ extension ICloudBackupWalletError: LocalizedError {
             return NSLocalizedString("iCloud_backup.error.container_not_found", comment: "iCloudBackup error")
         case .unableCreateBackupFolder:
             return NSLocalizedString("iCloud_backup.error.unable_create_backup_folder", comment: "iCloudBackup error")
-        case .keychainPasswordFailture:
-            return NSLocalizedString("iCloud_backup.error.keychain_password_failture", comment: "iCloudBackup error")
-        case .uploadToICloudFailture:
-            return NSLocalizedString("iCloud_backup.error.upload_to_iCloud_failture", comment: "iCloudBackup error")
+        case .keychainPasswordFailure:
+            return NSLocalizedString("iCloud_backup.error.keychain_password_failure", comment: "iCloudBackup error")
+        case .uploadToICloudFailure:
+            return NSLocalizedString("iCloud_backup.error.upload_to_iCloud_failure", comment: "iCloudBackup error")
         case .noInternetConnection:
             return NSLocalizedString("iCloud_backup.error.no_internet_connection", comment: "iCloudBackup error")
         }
@@ -97,7 +97,7 @@ extension ICloudBackupWalletError: LocalizedError {
 
     public var failureReason: String? {
         switch self {
-        case .uploadToICloudFailture:
+        case .uploadToICloudFailure:
             return NSLocalizedString("iCloud_backup.error.title.iCloud_synch", comment: "iCloudBackup error")
         default:
             return NSLocalizedString("iCloud_backup.error.title.create_backup", comment: "iCloudBackup error")
@@ -131,7 +131,7 @@ class ICloudBackup: NSObject {
         }
     }
 
-    var lastBackupString: String? {
+    var lastBackupDateString: String? {
         if let date = lastBackupDate {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMM dd yyy 'at' HH:mm a"
@@ -170,7 +170,7 @@ class ICloudBackup: NSObject {
         super.init()
         initialiseQuery()
         addNotificationObservers()
-        try? startObserveReachabilityChanges()
+        try? starObserveReachability()
     }
 
     private func initialiseQuery() {
@@ -208,11 +208,11 @@ class ICloudBackup: NSObject {
         do {
             if inProgress { query.stop(); inProgress = false }
 
-            guard let backupFolder = TariLib.shared.tariWallet?.publicKey.0?.hex.0 else { throw ICloudBackupWalletError.iCloudContainerNotFound }
+            guard let backupFolder = TariLib.shared.tariWallet?.publicKey.0?.hex.0 else { throw ICloudBackupError.iCloudContainerNotFound }
 
             let fileURL: URL
-            if let keyString = password {
-                fileURL = try encryptedZipWalletDatabase(keyString: keyString)
+            if let password = password {
+                fileURL = try getZippedAndEncryptedWalletDatabase(password: password)
             } else {
                 fileURL = try zipWalletDatabase()
             }
@@ -232,7 +232,7 @@ class ICloudBackup: NSObject {
             inProgress = true
             progressValue = 0.0
 
-            synchWithiCloud()
+            syncWithICloud()
         } catch {
             inProgress = false
             isLastBackupFailed = true
@@ -254,7 +254,7 @@ class ICloudBackup: NSObject {
                     UserDefaults.standard.set(true, forKey: "iCloudBackupsSwitcherIsOn")
 
                     if password != nil {
-                        Migrations.setBackupPasswordToKeychain(password: password!)
+                        BPKeychainWrapper.setBackupPasswordToKeychain(password: password!)
                     }
                 } else {
                     do {
@@ -274,16 +274,17 @@ class ICloudBackup: NSObject {
 
 // MARK: Reachability
 extension ICloudBackup {
-    private func startObserveReachabilityChanges() throws {
+    private func starObserveReachability() throws {
         reachability = try Reachability()
         NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(note:)), name: .reachabilityChanged, object: reachability)
         try reachability?.startNotifier()
     }
 
     @objc private func reachabilityChanged(note: Notification) {
-        synchWithiCloud()
+        syncWithICloud()
     }
-    private func stopReachability() {
+
+    private func stopObserveReachability() {
         reachability?.stopNotifier()
         NotificationCenter.default.removeObserver(self, name: .reachabilityChanged, object: reachability)
     }
@@ -339,7 +340,7 @@ extension ICloudBackup {
         } catch {
             isLastBackupFailed = true
             inProgress = false
-            notifyObservers(percent: 0, completed: false, error: ICloudBackupWalletError.uploadToICloudFailture)
+            notifyObservers(percent: 0, completed: false, error: ICloudBackupError.uploadToICloudFailure)
         }
     }
 
@@ -355,8 +356,8 @@ extension ICloudBackup {
 // MARK: - private methods
 extension ICloudBackup {
 
-    private func synchWithiCloud() {
-        if isInternetConnection() {
+    private func syncWithICloud() {
+        if isInternetConnected() {
             query.operationQueue?.addOperation({ [weak self] in
                 _ = self?.query.start()
                 self?.query.enableUpdates()
@@ -367,12 +368,12 @@ extension ICloudBackup {
             inProgress = false
             if backupExists() {
                 isLastBackupFailed = false
-                notifyObservers(percent: 100, completed: true, error: ICloudBackupWalletError.uploadToICloudFailture)
+                notifyObservers(percent: 100, completed: true, error: ICloudBackupError.uploadToICloudFailure)
             }
         }
     }
 
-    private func isInternetConnection() -> Bool {
+    private func isInternetConnected() -> Bool {
         guard let reachability = self.reachability else { return false }
         switch reachability.connection {
         case .wifi, .cellular:
@@ -393,10 +394,10 @@ extension ICloudBackup {
             if isBackupEncrypted {
                 do {
                     guard
-                        let keyString = password,
-                        let zippedURL = try self?.decryptedZipWalletDatabase(keyString: keyString, encryptedFileUrl: backupURL)
+                        let password = password,
+                        let zippedURL = try self?.decryptZippedWalletDatabase(password: password, encryptedFileUrl: backupURL)
                     else {
-                        completion(ICloudBackupWalletError.unarchiveError)
+                        completion(ICloudBackupError.unarchiveError)
                         return
                     }
                     zippedBackupURL = zippedURL
@@ -414,7 +415,7 @@ extension ICloudBackup {
             } catch {
                 switch error {
                 case Archive.ArchiveError.unreadableArchive: do {
-                    completion(ICloudBackupWalletError.invalidPassword)
+                    completion(ICloudBackupError.invalidPassword)
                     }
                 default: completion(error)
                 }
@@ -429,7 +430,7 @@ extension ICloudBackup {
             let folderPath = backupUrl.deletingLastPathComponent().path
             // if the last path component contains the “.icloud” extension. If yes the file is not on the device else the file is already downloaded.
             if lastPathComponent.contains(".icloud") {
-                if !isInternetConnection() { completion(nil, ICloudBackupWalletError.noInternetConnection) }
+                if !isInternetConnected() { completion(nil, ICloudBackupError.noInternetConnection) }
 
                 lastPathComponent.removeFirst()
                 let downloadedFilePath = folderPath + "/" + lastPathComponent.replacingOccurrences(of: ".icloud", with: "")
@@ -457,15 +458,15 @@ extension ICloudBackup {
                 }
             }
         } catch {
-            throw ICloudBackupWalletError.noICloudBackupExists
+            throw ICloudBackupError.noICloudBackupExists
         }
-        throw ICloudBackupWalletError.noICloudBackupExists
+        throw ICloudBackupError.noICloudBackupExists
     }
 
     private func zipWalletDatabase() throws -> URL {
         let archiveName = fileName + ".zip"
 
-        let tmpDirectory = try tempDirectory()
+        let tmpDirectory = try getTempDirectory()
         let archiveURL = tmpDirectory.appendingPathComponent(archiveName)
 
         if FileManager.default.fileExists(atPath: archiveURL.path) {
@@ -477,24 +478,24 @@ extension ICloudBackup {
         return archiveURL
     }
 
-    private func encryptedZipWalletDatabase(keyString: String) throws -> URL {
+    private func getZippedAndEncryptedWalletDatabase(password: String) throws -> URL {
         let zipURL = try zipWalletDatabase()
         let data = try Data(contentsOf: zipURL)
 
-        let aes = try AESEncryption(keyString: keyString)
+        let aes = try AESEncryption(keyString: password)
 
         let encryptedData = try aes.encrypt(data)
-        let fileURL = try tempDirectory().appendingPathComponent(fileName)
+        let fileURL = try getTempDirectory().appendingPathComponent(fileName)
         try encryptedData.write(to: fileURL)
 
         return fileURL
     }
 
-    private func decryptedZipWalletDatabase(keyString: String, encryptedFileUrl: URL) throws -> URL {
+    private func decryptZippedWalletDatabase(password: String, encryptedFileUrl: URL) throws -> URL {
         let data = try Data(contentsOf: encryptedFileUrl)
-        let aes = try AESEncryption(keyString: keyString)
+        let aes = try AESEncryption(keyString: password)
 
-        let decryptedZipUrl = try tempDirectory().appendingPathComponent(fileName + ".zip")
+        let decryptedZipUrl = try getTempDirectory().appendingPathComponent(fileName + ".zip")
 
         let decryptedData = try aes.decrypt(data)
         try decryptedData.write(to: decryptedZipUrl)
@@ -504,12 +505,12 @@ extension ICloudBackup {
 
     private func iCloudDirectory() throws -> URL {
         guard let url = FileManager.default.url(forUbiquityContainerIdentifier: TariSettings.shared.iCloudContainerIdentifier)?.appendingPathComponent("Tari-Wallet-Backups") else {
-            throw ICloudBackupWalletError.iCloudContainerNotFound
+            throw ICloudBackupError.iCloudContainerNotFound
         }
         return url
     }
 
-    private func tempDirectory() throws -> URL {
+    private func getTempDirectory() throws -> URL {
         if let tempZipDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Backups") {
 
             if !FileManager.default.fileExists(atPath: tempZipDirectory.path) {
@@ -517,11 +518,11 @@ extension ICloudBackup {
             }
 
             return tempZipDirectory
-        } else { throw ICloudBackupWalletError.failedToCreateZip }
+        } else { throw ICloudBackupError.failedToCreateZip }
     }
 
     private func cleanTempDirectory() throws {
-        let directory = try tempDirectory()
+        let directory = try getTempDirectory()
         try FileManager.default.removeItem(at: directory)
     }
 }

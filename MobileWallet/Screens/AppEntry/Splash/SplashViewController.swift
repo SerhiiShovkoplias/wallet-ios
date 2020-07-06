@@ -226,7 +226,7 @@ class SplashViewController: UIViewController, UITextViewDelegate {
             }
 
         } else {
-            Migrations.removeBackupPasswordFromKeychain()
+            BPKeychainWrapper.removeBackupPasswordFromKeychain()
             videoView.isHidden = false
             titleLabel.isHidden = false
             createWalletButton.isHidden = false

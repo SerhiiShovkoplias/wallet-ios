@@ -77,7 +77,7 @@ class PasswordVerificationViewController: SettingsParentViewController {
     }
 
     private func changePasswordAction() {
-        if let currentPassword = Migrations.loadBackupPasswordFromKeychain() {
+        if let currentPassword = BPKeychainWrapper.loadBackupPasswordFromKeychain() {
             if passwordField.comparePassword(currentPassword) {
                 navigationController?.pushViewController(SecureBackupViewController(), animated: true)
             }
@@ -245,9 +245,9 @@ extension PasswordVerificationViewController {
                 self?.view.layoutIfNeeded()
             }) { [weak self] _ in
                 if showKeyboard == true {
-                    self?.scrollView.scrollsToBottom(animated: true)
+                    self?.scrollView.scrollToBottom(animated: true)
                 } else {
-                    self?.scrollView.scrollsToTop(animated: true)
+                    self?.scrollView.scrollToTop(animated: true)
                 }
             }
         }

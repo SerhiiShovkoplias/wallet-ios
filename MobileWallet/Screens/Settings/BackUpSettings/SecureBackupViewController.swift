@@ -80,7 +80,7 @@ class SecureBackupViewController: SettingsParentViewController {
                         self.finishPendingProcess()
                     }
                 }
-                Migrations.setBackupPasswordToKeychain(password: password)
+                BPKeychainWrapper.setBackupPasswordToKeychain(password: password)
             } catch {
                 self.failedToCreateBackup(error: error)
             }
@@ -116,9 +116,9 @@ extension SecureBackupViewController {
                 self?.view.layoutIfNeeded()
             }) { [weak self] _ in
                 if showKeyboard == true {
-                    self?.scrollView.scrollsToBottom(animated: true)
+                    self?.scrollView.scrollToBottom(animated: true)
                 } else {
-                    self?.scrollView.scrollsToTop(animated: true)
+                    self?.scrollView.scrollToTop(animated: true)
                 }
             }
         }
