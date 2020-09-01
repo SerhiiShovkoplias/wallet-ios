@@ -5,6 +5,7 @@
  * This file is part of Onion Browser. See LICENSE file for redistribution terms.
  */
 // swiftlint:disable all
+
 import Foundation
 import Reachability
 import Tor
@@ -13,27 +14,41 @@ enum OnionManagerErrors: Error {
     case missingCookieFile
 }
 
-protocol OnionManagerDelegate {
-    func torConnProgress(_: Int)
+protocol OnionManagerDelegate: class {
+
+    func torConnProgress(_ progress: Int)
+
+    func torConnFinished()
+
+    func torConnDifficulties()
+    
     func torPortsOpened()
-    func torConnFinished(configuration: URLSessionConfiguration)
-    func torConnError()
 }
 
-public class OnionManager: NSObject {
-    public enum TorState: Int {
+class OnionManager: NSObject {
+    enum TorState: Int {
         case none
         case started
         case connected
         case stopped
     }
+    
+    static let shared = OnionManager()
+    private var reachability: Reachability?
+    
+    // Show Tor log in iOS' app log.
+    private static let TOR_LOGGING = false
+    static let CONTROL_ADDRESS = "127.0.0.1"
+    static let CONTROL_PORT: UInt16 = 39069
+    
+    // MARK: Built-in configuration options
 
-    public static let shared = OnionManager()
+    static let obfs4Bridges = NSArray(contentsOfFile: Bundle.main.path(forResource: "obfs4-bridges", ofType: "plist")!) as! [String]
+    static let meekAzureBridges = [
+        "meek_lite 0.0.2.0:3 97700DFE9F483596DDA6264C4D7DF7641E1E39CE url=https://meek.azureedge.net/ front=ajax.aspnetcdn.com"
+    ]
 
-    public static let CONTROL_ADDRESS = "127.0.0.1"
-    public static let CONTROL_PORT: UInt16 = 39069
-
-    public static func getCookie() throws -> Data {
+    static func getCookie() throws -> Data {
         if let cookieURL = OnionManager.torBaseConf.dataDirectory?.appendingPathComponent("control_auth_cookie") {
             let cookie = try Data(contentsOf: cookieURL)
 
@@ -44,13 +59,6 @@ public class OnionManager: NSObject {
             throw OnionManagerErrors.missingCookieFile
         }
     }
-
-    private var reachability: Reachability?
-    private var lastConnectionStatus: Reachability.Connection?
-    private var isListeningForNetworkChanges = false
-    
-    // Show Tor log in iOS' app log.
-    private static let isTorLogging = true
     
     private static let torBaseConf: TorConfiguration = {
         // Store data in <appdir>/Library/Caches/tor (Library/Caches/ is for things that can persist between
@@ -100,50 +108,24 @@ public class OnionManager: NSObject {
         ]
         return configuration
     }()
-
-    // MARK: - OnionManager instance
+    
+    var state = TorState.none
     private var torController: TorController?
-    var delegate: OnionManagerDelegate?
-
+    private let iObfs4Proxy = IObfs4ProxyThread()
     private var torThread: TorThread?
-
-    public var state: TorState = .none
-        
     private var initRetry: DispatchWorkItem?
-    private var failGuard: DispatchWorkItem?
-
+    private var bridgesType = OnionSettings.BridgesType.none
     private var customBridges: [String]?
-    private var needsReconfiguration: Bool = false
+    private var needsReconfiguration = false
 
-    @objc func networkChange(notification: NSNotification) {
-        guard isListeningForNetworkChanges else {
-            // skip the first network change event that happens immediately after registering
-            isListeningForNetworkChanges = true
-            return
+    private var cookie: Data? {
+        if let cookieUrl = OnionManager.torBaseConf.dataDirectory?.appendingPathComponent("control_auth_cookie") {
+            return try? Data(contentsOf: cookieUrl)
         }
-        guard let newConnectionStatus = (notification.object as? Reachability)?.connection,
-            newConnectionStatus != lastConnectionStatus else {
-            return
-        }
-        TariLogger.tor("Network change detected")
-        lastConnectionStatus = newConnectionStatus
-        switch newConnectionStatus {
-        case .unavailable, .none:
-            return // return if not connected
-        default:
-            break
-        }
-        
-        var confs: [Dictionary<String, String>] = []
-        confs.append(["key": "ClientPreferIPv6DirPort", "value": "auto"])
-        confs.append(["key": "ClientPreferIPv6ORPort", "value": "auto"])
-        confs.append(["key": "clientuseipv4", "value": "1"])
-
-        torController?.setConfs(confs, completion: { [weak self] _, _ in
-            guard let self = self else { return }
-            self.torReconnect()
-        })
+        return nil
     }
+
+    
 
     func torReconnect() {
         guard self.torThread != nil else {
@@ -157,113 +139,170 @@ public class OnionManager: NSObject {
             TariLogger.tor("Tor reconnected")
         })
     }
+
+    /**
+    Get all fully built circuits and detailed info about their nodes.
+
+    - parameter callback: Called, when all info is available.
+    - parameter circuits: A list of circuits and the nodes they consist of.
+    */
+    func getCircuits(_ callback: @escaping ((_ circuits: [TorCircuit]) -> Void)) {
+        torController?.getCircuits(callback)
+    }
     
-    func reconnectOnNetworkChanges() {
-        guard reachability == nil else {
-            return
-        }
-        do {
-            reachability = try Reachability()
-            // add observer
-            NotificationCenter.default.addObserver(
-                self,
-                selector: #selector(self.networkChange),
-                name: NSNotification.Name.reachabilityChanged,
-                object: nil
-            )
-            try reachability?.startNotifier()
-            TariLogger.tor("Listening for reachability changes to reconnect tor")
-        } catch {
-            TariLogger.tor("Failed to init Reachability", error: error)
+    func closeCircuits(_ circuits: [TorCircuit], _ callback: @escaping ((_ success: Bool) -> Void)) {
+        torController?.close(circuits, completion: callback)
+    }
+    
+    func startIObfs4Proxy() {
+        if !iObfs4Proxy.isExecuting && !iObfs4Proxy.isCancelled && !iObfs4Proxy.isFinished {
+            // Set the needed environment variables, so ObfsProxy can be used stand-alone.
+            setenv("TOR_PT_MANAGED_TRANSPORT_VER", "1", 0)
+            setenv("TOR_PT_CLIENT_TRANSPORTS", "obfs4,meek_lite,obfs2,obfs3,scramblesuit", 0)
+            setenv("TOR_PT_STATE_LOCATION", FileManager.default.temporaryDirectory.appendingPathComponent("pt_state").path, 0)
+
+            iObfs4Proxy.start()
         }
     }
 
-    func startTor(delegate: OnionManagerDelegate) {
-        self.delegate = delegate
+    func startTor(delegate: OnionManagerDelegate?) {
+        // Avoid a retain cycle. Only use the weakDelegate in closures!
+        weak var weakDelegate = delegate
+
         cancelInitRetry()
-        cancelFailGuard()
-        
         state = .started
 
         if (self.torController == nil) {
             self.torController = TorController(socketHost: OnionManager.CONTROL_ADDRESS, port: OnionManager.CONTROL_PORT)
         }
 
-        if (torThread == nil || torThread?.isCancelled == true) && TorThread.active?.isExecuting != true {
-            self.torThread = nil
+        do {
+            try startObserveReachability()
+            TariLogger.tor("Listening for reachability changes to reconnect tor")
+        } catch {
+            TariLogger.tor("Failed to init Reachability", error: error)
+        }
+
+
+        if torThread?.isCancelled ?? true {
+            torThread = nil
 
             let torConf = OnionManager.torBaseConf
 
-            let args = torConf.arguments
+            var args = torConf.arguments!
 
-            TariLogger.tor(String(describing: args))
+            // Add user-defined configuration.
+            args += OnionSettings.advancedTorConf ?? []
 
-            torConf.arguments = args
-            self.torThread = TorThread(configuration: torConf)
-            needsReconfiguration = false
+            args += getBridgesAsArgs()
 
-            DispatchQueue.main.async { [weak self] in
-                self?.torThread?.start()
+            // configure ipv4/ipv6
+            // Use Ipv6Tester. If we _think_ we're IPv6-only, tell Tor to prefer IPv6 ports.
+            // (Tor doesn't always guess this properly due to some internal IPv4 addresses being used,
+            // so "auto" sometimes fails to bootstrap.)
+            TariLogger.tor("ipv6_status: \(Ipv6Tester.ipv6_status())")
+            if (Ipv6Tester.ipv6_status() == .torIpv6ConnOnly) {
+                args += ["--ClientPreferIPv6ORPort", "1"]
+
+                if bridgesType != .none {
+                    // Bridges on, leave IPv4 on.
+                    // User's bridge config contains all the IPs (v4 or v6)
+                    // that we connect to, so we let _that_ setting override our
+                    // "IPv6 only" self-test.
+                    args += ["--ClientUseIPv4", "1"]
+                }
+                else {
+                    // Otherwise, for IPv6-only no-bridge state, disable IPv4
+                    // connections from here to entry/guard nodes.
+                    // (i.e. all outbound connections are ipv6 only.)
+                    args += ["--ClientUseIPv4", "0"]
+                }
+            }
+            else {
+                args += [
+                    "--ClientPreferIPv6ORPort", "auto",
+                    "--ClientUseIPv4", "1",
+                ]
             }
 
+            #if DEBUG
+            TariLogger.tor("arguments=\(String(describing: args))")
+            #endif
+
+            torConf.arguments = args
+            torThread = TorThread(configuration: torConf)
+            needsReconfiguration = false
+
+            torThread?.start()
+            startIObfs4Proxy()
             TariLogger.tor("Starting Tor")
-        } else {
+        }
+        else {
             if needsReconfiguration {
-                // Not using bridges, so null out the "Bridge" conf
-                torController?.setConfForKey("usebridges", withValue: "0", completion: { _, _ in
-                })
-                torController?.resetConf(forKey: "bridge", completion: { _, _ in
-                })
+                let conf = getBridgesAsConf()
+
+                torController?.resetConf(forKey: "Bridge")
+
+                if conf.count > 0 {
+                    // Bridges need to be set *before* "UseBridges"="1"!
+                    torController?.setConfs(conf)
+                    torController?.setConfForKey("UseBridges", withValue: "1")
+                }
+                else {
+                    torController?.setConfForKey("UseBridges", withValue: "0")
+                }
             }
         }
 
-        // Wait long enough for tor itself to have started. It's OK to wait for this
+        // Wait long enough for Tor itself to have started. It's OK to wait for this
         // because Tor is already trying to connect; this is just the part that polls for
         // progress.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: { [weak self] in
-            guard let self = self else { return }
-
-            // README: We're only keeping error/fault messages as these are sent into Sentry breadcrumbs
-            // which seem to be kept in memory. Having other tor logging levels on causes memory warnings or
-            // forced termination of the app as there are too many messages.
-            
-            if OnionManager.isTorLogging {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+            if OnionManager.TOR_LOGGING {
+                // Show Tor log in iOS' app log.
                 TORInstallTorLoggingCallback { severity, msg in
-                    var type = ""
+                    let s: String
+
                     switch severity {
                     case .debug:
-                        return
+                        s = "debug"
+
                     case .error:
-                        type = "error"
+                        s = "error"
+
                     case .fault:
-                        type = "fault"
+                        s = "fault"
+
                     case .info:
-                        return
+                        s = "info"
+
                     default:
-                        return
+                        s = "default"
                     }
 
-                    TariLogger.tor("[Tor \(type)] \(String(cString: msg))")
+                    TariLogger.tor("[Tor libevent \(s)] \(String(cString: msg))")
                 }
-
                 TORInstallEventLoggingCallback { severity, msg in
-                    //Logic here is duplicated from above. Moving to shared funcrtion causes error:
-                    //"a C function pointer cannot be formed from a closure that captures context"
-                    var type = ""
+                    let s: String
+
                     switch severity {
                     case .debug:
-                        return // Ignore libevent debug messages. Just too many of typically no importance.
-                    case .error:
-                        type = "error"
-                    case .fault:
-                        type = "fault"
-                    case .info:
-                        type = "info"
-                    default:
+                        // Ignore libevent debug messages. Just too many of typically no importance.
                         return
-                    }
 
-                    TariLogger.tor("[Tor libevent \(type)] \(String(cString: msg))")
+                    case .error:
+                        s = "error"
+
+                    case .fault:
+                        s = "fault"
+
+                    case .info:
+                        s = "info"
+
+                    default:
+                        s = "default"
+                    }
+                    TariLogger.tor("[Tor libevent \(s)] \(String(cString: msg).trimmingCharacters(in: .whitespacesAndNewlines))")
                 }
             }
 
@@ -275,133 +314,228 @@ public class OnionManager: NSObject {
                 }
             }
 
-            do {
-                let cookie = try OnionManager.getCookie()
-
-                self.torController?.authenticate(with: cookie, completion: { [weak self] success, error in
-                    guard let self = self else { return }
-
-                    if success {
-                        self.delegate?.torPortsOpened()
-                        TariLogger.tor("Tor cookie auth success and ports opened")
-
-                        var completeObserver: Any?
-                                                
-                        completeObserver = self.torController?.addObserver(forCircuitEstablished: { [weak self] established in
-                            guard let self = self else { return }
-                            
-                            if established || self.torController?.isConnected ?? false {
-                                self.state = .connected
-                                self.torController?.removeObserver(completeObserver)
-                                self.cancelInitRetry()
-                                self.cancelFailGuard()
-                                self.reconnectOnNetworkChanges()
-
-                                TariLogger.tor("Tor connection established")
-
-                                self.torController?.getSessionConfiguration({ [weak self] configuration in
-                                    guard let self = self else { return }
-                                    //TODO once below issue is resolved we can update to < 400.6.3 then the session config will not be nil
-                                    //https://github.com/iCepa/Tor.framework/issues/60
-                                    self.delegate?.torConnFinished(configuration: configuration ?? URLSessionConfiguration.default)
-                                })
-                            } else {
-                                TariLogger.tor("Tor connection not established")
-                            }
-                        }) // torController.addObserver
-                        var progressObserver: Any?
-                        
-                        progressObserver = self.torController?.addObserver(forStatusEvents: { [weak self]
-                            (type: String, _: String, action: String, arguments: [String: String]?) -> Bool in
-                            guard let self = self else { return false }
-
-                            if type == "STATUS_CLIENT" && action == "BOOTSTRAP" {
-                                guard let args = arguments else { return false }
-                                guard let progressArg = args["PROGRESS"] else { return false }
-                                guard let progress = Int(progressArg) else { return false }
-
-                                TariLogger.tor("Tor bootstrap progress: \(progress)")
-
-                                self.delegate?.torConnProgress(progress)
-                                
-                                if progress >= 100 {
-                                    self.torController?.removeObserver(progressObserver)
-                                }
-
-                                return true
-                            }
-
-                            return false
-                        }) // torController.addObserver
-                    } // if success (authenticate)
-                    else {
-                        TariLogger.tor("Didn't connect to control port.", error: error)
-                    }
-                }) // controller authenticate
-            } catch {
-                TariLogger.tor("Tor auth error", error: error)
+            guard let cookie = self.cookie else {
+                TariLogger.tor("Could not connect to Tor - cookie unreadable!")
+                return
             }
-        }) //delay
-        initRetry = DispatchWorkItem { [weak self] in
-            guard let self = self else { return }
 
-            TariLogger.tor("Triggering Tor connection retry.")
+            #if DEBUG
+            TariLogger.tor("cookie= \(cookie.base64EncodedString())")
+            #endif
 
-            self.torController?.setConfForKey("DisableNetwork", withValue: "1", completion: { _, _ in
-            })
+            self.torController?.authenticate(with: cookie, completion: { success, error in
+                if success {
+                    delegate?.torPortsOpened()
+                    var completeObs: Any?
+                    completeObs = self.torController?.addObserver(forCircuitEstablished: { established in
+                        if established {
+                            self.state = .connected
+                            self.torController?.removeObserver(completeObs)
+                            self.cancelInitRetry()
+                            #if DEBUG
+                            TariLogger.tor("Connection established!")
+                            #endif
 
-            self.torController?.setConfForKey("DisableNetwork", withValue: "0", completion: { _, _ in
-            })
+                            weakDelegate?.torConnFinished()
+                        }
+                    }) // torController.addObserver
 
-            self.failGuard = DispatchWorkItem {
-                if self.state != .connected {
-                    self.delegate?.torConnError()
+                    var progressObs: Any?
+                    progressObs = self.torController?.addObserver(forStatusEvents: {
+                        (type: String, severity: String, action: String, arguments: [String : String]?) -> Bool in
+
+                        if type == "STATUS_CLIENT" && action == "BOOTSTRAP" {
+                            let progress = Int(arguments!["PROGRESS"]!)!
+                            #if DEBUG
+                            TariLogger.tor("progress=\(progress)")
+                            #endif
+
+                            weakDelegate?.torConnProgress(progress)
+
+                            if progress >= 100 {
+                                self.torController?.removeObserver(progressObs)
+                            }
+
+                            return true
+                        }
+
+                        return false
+                    })
+                } else {
+                    TariLogger.tor("Didn't connect to control port.", error: error)
                 }
-            }
+            }) // controller authenticate
+        }) //delay
 
-            // Show error to user, when, after 90 seconds (30 sec + one retry of 60 sec), Tor has still not started.
-            guard let executeFailGuard = self.failGuard else { return }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 60, execute: executeFailGuard)
+        initRetry = DispatchWorkItem {
+            #if DEBUG
+            TariLogger.tor("Triggering Tor connection retry.")
+            #endif
+
+            self.torController?.setConfForKey("DisableNetwork", withValue: "1")
+            self.torController?.setConfForKey("DisableNetwork", withValue: "0")
+
+            // Hint user that they might need to use a bridge.
+            delegate?.torConnDifficulties()
         }
 
         // On first load: If Tor hasn't finished bootstrap in 30 seconds,
         // HUP tor once in case we have partially bootstrapped but got stuck.
-        guard let executeRetry = initRetry else { return }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 30, execute: executeRetry)
-    }// startTor
+        DispatchQueue.main.asyncAfter(deadline: .now() + 15, execute: initRetry!)
+    }
+    
     /**
-     Experimental Tor shutdown.
-     */
-    @objc func stopTor() {
+    Experimental Tor shutdown.
+    */
+    func stopTor() {
         TariLogger.tor("Stopping tor")
-        
-        // under the hood, TORController will SIGNAL SHUTDOWN and set it's channel to nil, so
-        // we actually rely on that to stop tor and reset the state of torController. (we can
-        // SIGNAL SHUTDOWN here, but we can't reset the torController "isConnected" state.)
-        
-        //torController?.removeObserver(self) //Causes EXC_BAD_ACCESS (code=257). Setting the controller to nil should acomplish the same.
-        torController?.disconnect()
 
+        // Under the hood, TORController will SIGNAL SHUTDOWN and set it's channel to nil, so
+        // we actually rely on that to stop Tor and reset the state of torController. (we can
+        // SIGNAL SHUTDOWN here, but we can't reset the torController "isConnected" state.)
+        torController?.disconnect()
         torController = nil
 
         // More cleanup
         torThread?.cancel()
+        torThread = nil
+
         state = .stopped
+    }
+    
+    /**
+    Set bridges configuration and evaluate, if the new configuration is actually different
+    then the old one.
+
+    - parameter bridgesType: the selected ID as defined in OBSettingsConstants.
+    - parameter customBridges: a list of custom bridges the user configured.
+    */
+    func setBridgeConfiguration(bridgesType: OnionSettings.BridgesType, customBridges: [String]?) {
+        needsReconfiguration = bridgesType != self.bridgesType
+
+        if !needsReconfiguration {
+            if let oldVal = self.customBridges, let newVal = customBridges {
+                needsReconfiguration = oldVal != newVal
+            }
+            else{
+                needsReconfiguration = (self.customBridges == nil && customBridges != nil) ||
+                    (self.customBridges != nil && customBridges == nil)
+            }
+        }
+
+        self.bridgesType = bridgesType
+        self.customBridges = customBridges
+    }
+}
+
+// MARK: Private Methods
+
+
+extension OnionManager {
+    /**
+    - returns: The list of bridges which is currently configured to be valid.
+    */
+    private func getBridges() -> [String] {
+        #if DEBUG
+        TariLogger.tor("bridgesId=\(bridgesType)")
+        #endif
+
+        switch bridgesType {
+        case .obfs4:
+            return OnionManager.obfs4Bridges
+
+        case .meekazure:
+            return OnionManager.meekAzureBridges
+
+        case .custom:
+            return customBridges ?? []
+
+        default:
+            return []
+        }
     }
 
     /**
-     Cancel the connection retry
-     */
+    - returns: The list of bridges which is currently configured to be valid *as argument list* to be used on Tor startup.
+    */
+    private func getBridgesAsArgs() -> [String] {
+        var args = [String]()
+
+        for bridge in getBridges() {
+            args += ["--Bridge", bridge]
+        }
+
+        if args.count > 0 {
+            args.append(contentsOf: ["--UseBridges", "1"])
+        }
+
+        return args
+    }
+
+    /**
+    Each bridge line needs to be wrapped in double-quotes (").
+
+    - returns: The list of bridges which is currently configured to be valid *as configuration list* to be used with `TORController#setConfs`.
+    */
+    private func getBridgesAsConf() -> [[String: String]] {
+        return getBridges().map { ["key": "Bridge", "value": "\"\($0)\""] }
+    }
+
+    /**
+    Cancel the connection retry and fail guard.
+    */
     private func cancelInitRetry() {
         initRetry?.cancel()
         initRetry = nil
     }
+}
 
-    /**
-     Cancel the fail guard.
-     */
-    private func cancelFailGuard() {
-        failGuard?.cancel()
-        failGuard = nil
+// MARK: Reachability
+
+extension OnionManager {
+    @objc private func networkChange() {
+        TariLogger.tor("ipv6_status: \(Ipv6Tester.ipv6_status())")
+        var confs:[Dictionary<String,String>] = []
+
+        if (Ipv6Tester.ipv6_status() == .torIpv6ConnOnly) {
+            // We think we're on a IPv6-only DNS64/NAT64 network.
+            confs.append(["key": "ClientPreferIPv6ORPort", "value": "1"])
+
+            if (self.bridgesType != .none) {
+                // Bridges on, leave IPv4 on.
+                // User's bridge config contains all the IPs (v4 or v6)
+                // that we connect to, so we let _that_ setting override our
+                // "IPv6 only" self-test.
+                confs.append(["key": "ClientUseIPv4", "value": "1"])
+            }
+            else {
+                // Otherwise, for IPv6-only no-bridge state, disable IPv4
+                // connections from here to entry/guard nodes.
+                //(i.e. all outbound connections are IPv6 only.)
+                confs.append(["key": "ClientUseIPv4", "value": "0"])
+            }
+        } else {
+            // default mode
+            confs.append(["key": "ClientPreferIPv6DirPort", "value": "auto"])
+            confs.append(["key": "ClientPreferIPv6ORPort", "value": "auto"])
+            confs.append(["key": "ClientUseIPv4", "value": "1"])
+        }
+
+        torController?.setConfs(confs, completion: { _, _ in
+            self.torReconnect()
+        })
+    }
+    
+    private func startObserveReachability() throws {
+        stopObserveReachability()
+        reachability = try Reachability()
+        NotificationCenter.default.addObserver(self, selector: #selector(networkChange),
+        name: .reachabilityChanged, object: nil)
+        try reachability?.startNotifier()
+    }
+
+    private func stopObserveReachability() {
+        reachability?.stopNotifier()
+        NotificationCenter.default.removeObserver(self, name: .reachabilityChanged, object: nil)
     }
 }

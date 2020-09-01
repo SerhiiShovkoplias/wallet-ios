@@ -383,3 +383,28 @@
 /* Loading gif button */
 "loading_gif_button.title.loading" = "Loading GIF";
 "loading_gif_button.title.retry" = "Retry loading GIF";
+
+/* AdvancedSettings view */
+"advanced_settings.title" = "Advanced Settings";
+"advanced_settings.item.base_node_adress_and_public_key" = "Base node address & public key";
+"advanced_settings.item.bridge_configuration" = "Bridge Configuration";
+
+"advanced_settings.item.header.baseNode" = "Wallet base node";
+"advanced_settings.item.header.torNode" = "Tor node";
+
+/* BridgesConfiguration view */
+"bridges_configuration.title" = "Bridges Configuration";
+
+"bridges_configuration.item.request_bridges_from_torproject" = "Request Bridges from torproject.org";
+
+"bridges_configuration.item.noBridges" = "No Bridges";
+"bridges_configuration.item.obfs4" = "Built-in obfs4";
+"bridges_configuration.item.meekazure" = "Built-in meek-azure";
+"bridges_configuration.item.custom" = "Custom Bridges";
+
+"bridges_configuration.description.bridges" = "If you are in a country or using a connection that censors Tor, you might need to use bridges.";
+"bridges_configuration.description.obfs4" = "• obfs4 makes your traffic appear \"random\"";
+"bridges_configuration.description.meekazure" = "• meek-azure makes your traffic pose as traffic to a Microsoft website.";
+"bridges_configuration.description.custom" = "If one type of bridge does not work, try using a different one.";
+
+"bridges_configuration.connect" = "Connect";

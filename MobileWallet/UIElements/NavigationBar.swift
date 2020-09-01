@@ -147,13 +147,15 @@ class NavigationBar: UIView, NavigationBarProtocol {
 
     private func setupRightButton() {
         rightButton.isHidden = true
+        rightButton.titleLabel?.adjustsFontSizeToFitWidth = true
+
         addSubview(rightButton)
 
         rightButton.translatesAutoresizingMaskIntoConstraints = false
         rightButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
         rightButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15.0).isActive = true
         rightButton.heightAnchor.constraint(equalToConstant: 45).isActive = true
-        rightButton.widthAnchor.constraint(equalToConstant: 45).isActive = true
+        rightButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 15).isActive = true
         rightButton.addTarget(self, action: #selector(rightButtonAction(_sender:)), for: .touchUpInside)
     }
 

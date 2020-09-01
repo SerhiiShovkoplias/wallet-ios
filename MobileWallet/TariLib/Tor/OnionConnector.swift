@@ -53,14 +53,14 @@ public final class OnionConnector {
 
     private var onProgress: ((Int) -> Void)?
     private var onPortsOpen: (() -> Void)?
-    private var onCompletion: ((Result<URLSessionConfiguration, OnionError>) -> Void)?
+    private var onCompletion: ((_ result: Result<Bool, OnionError>) -> Void)?
 
     private init() {}
 
     public func start(
             onProgress: ((Int) -> Void)?,
             onPortsOpen: (() -> Void)?,
-            onCompletion: @escaping (Result<URLSessionConfiguration, OnionError>) -> Void
+            onCompletion: ((_ result: Result<Bool, OnionError>) -> Void)?
     ) {
         self.onProgress = onProgress
         self.onPortsOpen = onPortsOpen
@@ -74,20 +74,21 @@ public final class OnionConnector {
 }
 
 extension OnionConnector: OnionManagerDelegate {
+
     func torConnProgress(_ progress: Int) {
         onProgress?(progress)
     }
 
-    func torPortsOpened() {
-        onPortsOpen?()
+    func torConnFinished() {
+        onCompletion?(.success(true))
     }
 
-    func torConnFinished(configuration: URLSessionConfiguration) {
-        onCompletion?(.success(configuration))
-    }
-
-    func torConnError() {
+    func torConnDifficulties() {
         TariLogger.error("Tor connection error", error: OnionError.connectionError)
         onCompletion?(.failure(.connectionError))
+    }
+
+    func torPortsOpened() {
+        onPortsOpen?()
     }
 }

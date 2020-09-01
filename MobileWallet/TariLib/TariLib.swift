@@ -251,7 +251,7 @@ class TariLib {
                 switch result {
                     case .success(let urlSessionConfiguration):
                         TariEventBus.postToMainThread(.torConnectionProgress, sender: Int(100))
-                        TariEventBus.postToMainThread(.torConnected, sender: urlSessionConfiguration)
+                        TariEventBus.postToMainThread(.torConnected, sender: nil)
 
                         try? self.tariWallet?.syncBaseNode()
                     case .failure(let error):
