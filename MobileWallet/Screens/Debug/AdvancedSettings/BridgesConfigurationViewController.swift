@@ -40,12 +40,14 @@
 
 import UIKit
 
-struct BridgesConfuguration {
-    let bridges: OnionSettings.BridgesType
-    let customBridges: [String]?
-}
-
 class BridgesConfigurationViewController: SettingsParentTableViewController {
+
+    typealias BridgesType = OnionSettings.BridgesType
+
+    private lazy var bridgesConfiguration: BridgesConfuguration = {
+        BridgesConfuguration(bridges: OnionSettings.currentlyUsedBridges, customBridges: OnionSettings.customBridges)
+    }()
+
     private enum Section: Int {
         case requestBridges
         case chooseBridge
@@ -82,15 +84,15 @@ class BridgesConfigurationViewController: SettingsParentTableViewController {
         return description.joined(separator: "\n")
     }()
 
-    private lazy var requestBridgesSectionItems: [SystemMenuTableViewCellItem] = [
+    private let requestBridgesSectionItems: [SystemMenuTableViewCellItem] = [
         SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.requestBridgesFromTorproject.rawValue)
     ]
 
     private let chooseBridgeSectionItems: [SystemMenuTableViewCellItem] = [
-        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.noBridges.rawValue, mark: .success, hasArrow: false),
-        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.obfs4.rawValue, hasArrow: false),
-        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.meekazure.rawValue, hasArrow: false),
-        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.custom.rawValue)
+        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.noBridges.rawValue, mark: OnionConnector.shared.bridgesConfiguration.bridges == BridgesType.none ? .scheduled : .none, hasArrow: false),
+        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.obfs4.rawValue, mark: OnionConnector.shared.bridgesConfiguration.bridges == BridgesType.obfs4 ? .scheduled : .none, hasArrow: false),
+        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.meekazure.rawValue, mark: OnionConnector.shared.bridgesConfiguration.bridges == BridgesType.meekazure ? .scheduled : .none, hasArrow: false),
+        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.custom.rawValue, mark: OnionConnector.shared.bridgesConfiguration.bridges == BridgesType.custom ? .scheduled : .none)
     ]
 
     override func viewDidLoad() {
@@ -107,6 +109,8 @@ extension BridgesConfigurationViewController {
         navigationBar.title = NSLocalizedString("bridges_configuration.title", comment: "BridgesConfiguration view")
 
         navigationBar.rightButtonAction = { [weak self] in
+            guard let self = self else { return }
+            OnionConnector.shared.bridgesConfiguration = self.bridgesConfiguration
             //self?.dismiss(animated: true, completion: nil)
         }
 
@@ -184,7 +188,22 @@ extension BridgesConfigurationViewController: UITableViewDelegate, UITableViewDa
             chooseBridgeSectionItems.forEach { (item) in
                 item.mark = .none
             }
-            chooseBridgeSectionItems[indexPath.row].mark = .success
+            chooseBridgeSectionItems[indexPath.row].mark = .scheduled
+
+            let raw = BridgesConfigurationItemTitle.allCases[indexPath.section + indexPath.row]
+
+            switch raw {
+            case .noBridges:
+                bridgesConfiguration.bridges = BridgesType.none
+            case .obfs4:
+                bridgesConfiguration.bridges = BridgesType.obfs4
+            case .meekazure:
+                bridgesConfiguration.bridges = BridgesType.meekazure
+            case .custom:
+                bridgesConfiguration.bridges = BridgesType.custom
+            default:
+                return
+            }
         }
     }
 }

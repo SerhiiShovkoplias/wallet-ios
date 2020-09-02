@@ -427,6 +427,10 @@
 		379D27AF244EF25000F1AD98 /* NavigationBarWithSubtitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379D27AE244EF25000F1AD98 /* NavigationBarWithSubtitle.swift */; };
 		379D27BA244F091A00F1AD98 /* NavigationBarWithSubtitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379D27AE244EF25000F1AD98 /* NavigationBarWithSubtitle.swift */; };
 		379D27BB244F091B00F1AD98 /* NavigationBarWithSubtitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379D27AE244EF25000F1AD98 /* NavigationBarWithSubtitle.swift */; };
+		379E754F24FFC5C100C29A27 /* AdvancedSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E885E24FE6ED100576F61 /* AdvancedSettingsViewController.swift */; };
+		379E755024FFC5C200C29A27 /* AdvancedSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E885E24FE6ED100576F61 /* AdvancedSettingsViewController.swift */; };
+		379E755224FFC5F000C29A27 /* BridgesConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E886024FE7AE800576F61 /* BridgesConfigurationViewController.swift */; };
+		379E755324FFC5F000C29A27 /* BridgesConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E886024FE7AE800576F61 /* BridgesConfigurationViewController.swift */; };
 		37ABB69024781CE800F08163 /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABB68F24781CE800F08163 /* UILabel.swift */; };
 		37ABB69124781CE800F08163 /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABB68F24781CE800F08163 /* UILabel.swift */; };
 		37ABB69224781CE800F08163 /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABB68F24781CE800F08163 /* UILabel.swift */; };
@@ -2401,6 +2405,7 @@
 				00D7BD8A24349AE3009DD097 /* UIDevice.swift in Sources */,
 				00F53A6B24290FAE00448466 /* StorageCleanup.swift in Sources */,
 				37ABB69524781F8600F08163 /* UILabelWithPadding.swift in Sources */,
+				379E755224FFC5F000C29A27 /* BridgesConfigurationViewController.swift in Sources */,
 				37B48A8424B3968F00F8A8D2 /* BPKeychainWrapper.swift in Sources */,
 				004277E823DF4A5600AE7BD9 /* FeedbackView.swift in Sources */,
 				37CB9F8B2451A2AD00C495F2 /* String+Emoji.swift in Sources */,
@@ -2486,6 +2491,7 @@
 				373CCDC62490F3B600D0A2C9 /* FileManager+SecureCopy.swift in Sources */,
 				37B444AA248949B800592D92 /* Checkbox.swift in Sources */,
 				00BBD813237E9EE200EBF5E6 /* PrivateKey.swift in Sources */,
+				379E754F24FFC5C100C29A27 /* AdvancedSettingsViewController.swift in Sources */,
 				BFF1ED9E2408111000CC9EF6 /* SendingTariViewController.swift in Sources */,
 				001F6CE12380198D00FA7002 /* Contacts.swift in Sources */,
 				00369D84242618A900BAB95B /* TariLogger.swift in Sources */,
@@ -2517,6 +2523,7 @@
 				00C185C62390221A0096984E /* DevelopmentUI.swift in Sources */,
 				0039B1B423FA925500F91E0F /* PasteEmojisView.swift in Sources */,
 				BFC5532723D9B8E4009130A8 /* UIView.swift in Sources */,
+				379E755324FFC5F000C29A27 /* BridgesConfigurationViewController.swift in Sources */,
 				BFD758E823E98ABD00B0F1A5 /* ProfileViewController.swift in Sources */,
 				37ABB69224781CE800F08163 /* UILabel.swift in Sources */,
 				00E491C12366E08F007B332D /* MobileWalletUITests.swift in Sources */,
@@ -2638,6 +2645,7 @@
 				004997B52382ED68000A0B7D /* PendingInboundTx.swift in Sources */,
 				00230B042376C75B00F23E34 /* TxsTableViewControllerExtension.swift in Sources */,
 				37BB696D245705E70013AC4D /* RadialGradientView.swift in Sources */,
+				379E755024FFC5C200C29A27 /* AdvancedSettingsViewController.swift in Sources */,
 				00A66529243C766D0046E730 /* ConnectionMonitor.swift in Sources */,
 				619198F3E20DFABEB23F63FE /* UTXO.swift in Sources */,
 			);

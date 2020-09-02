@@ -40,6 +40,16 @@
 
 import Foundation
 
+class BridgesConfuguration {
+    var bridges: OnionSettings.BridgesType
+    var customBridges: [String]?
+
+    init(bridges: OnionSettings.BridgesType, customBridges: [String]?) {
+        self.bridges = bridges
+        self.customBridges = customBridges
+    }
+}
+
 public final class OnionConnector {
     public static let shared = OnionConnector()
 
@@ -49,6 +59,19 @@ public final class OnionConnector {
 
     var connectionState: OnionManager.TorState {
         return OnionManager.shared.state
+    }
+
+    var bridgesConfiguration: BridgesConfuguration {
+        get {
+            BridgesConfuguration(bridges: OnionSettings.currentlyUsedBridges, customBridges: OnionSettings.customBridges)
+        }
+
+        set {
+            OnionManager.shared.setBridgeConfiguration(bridgesType: newValue.bridges, customBridges: newValue.customBridges)
+            OnionSettings.currentlyUsedBridges = newValue.bridges
+            OnionSettings.customBridges = newValue.customBridges
+            OnionManager.shared.startTor(delegate: self)
+        }
     }
 
     private var onProgress: ((Int) -> Void)?

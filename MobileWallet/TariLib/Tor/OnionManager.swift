@@ -114,7 +114,7 @@ class OnionManager: NSObject {
     private let iObfs4Proxy = IObfs4ProxyThread()
     private var torThread: TorThread?
     private var initRetry: DispatchWorkItem?
-    private var bridgesType = OnionSettings.BridgesType.none
+    private var bridgesType = OnionSettings.currentlyUsedBridges
     private var customBridges: [String]?
     private var needsReconfiguration = false
 
@@ -190,9 +190,6 @@ class OnionManager: NSObject {
             let torConf = OnionManager.torBaseConf
 
             var args = torConf.arguments!
-
-            // Add user-defined configuration.
-            args += OnionSettings.advancedTorConf ?? []
 
             args += getBridgesAsArgs()
 
