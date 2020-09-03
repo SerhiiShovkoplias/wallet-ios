@@ -115,7 +115,7 @@ class OnionManager: NSObject {
     private var torThread: TorThread?
     private var initRetry: DispatchWorkItem?
     private var bridgesType = OnionSettings.currentlyUsedBridges
-    private var customBridges: [String]?
+    private var customBridges = OnionSettings.customBridges
     private var needsReconfiguration = false
 
     private var cookie: Data? {

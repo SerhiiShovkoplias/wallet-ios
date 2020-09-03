@@ -63,7 +63,6 @@ class OnionSettings: NSObject {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: "custom_bridges")
-
         }
     }
 }

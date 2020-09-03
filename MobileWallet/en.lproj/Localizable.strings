@@ -395,8 +395,6 @@
 /* BridgesConfiguration view */
 "bridges_configuration.title" = "Bridges Configuration";
 
-"bridges_configuration.item.request_bridges_from_torproject" = "Request Bridges from torproject.org";
-
 "bridges_configuration.item.noBridges" = "No Bridges";
 "bridges_configuration.item.obfs4" = "Built-in obfs4";
 "bridges_configuration.item.meekazure" = "Built-in meek-azure";
@@ -408,3 +406,13 @@
 "bridges_configuration.description.custom" = "If one type of bridge does not work, try using a different one.";
 
 "bridges_configuration.connect" = "Connect";
+
+/* CustomBridges view */
+"custom_bridges.title" = "Custom Bridges";
+"custom_bridges.connect" = "Connect";
+
+"custom_bridges.item.paste_bridges" = "Paste Bridges";
+
+"custom_bridges.item.request_bridges_from_torproject" = "Request Bridges from torproject.org";
+"custom_bridges.item.scan_QR_code" = "Scan QR Code";
+"custom_bridges.item.upload_QR_code" = "Upload QR Code";

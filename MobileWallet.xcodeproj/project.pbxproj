@@ -424,13 +424,10 @@
 		378B4BC42498E5A000C00CCF /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CD8FFA246D5CD80001E43C /* Migrations.swift */; };
 		378B4BC52498E5A100C00CCF /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CD8FFA246D5CD80001E43C /* Migrations.swift */; };
 		378B4BD02498F83000C00CCF /* PendingCircleAnimation.json in Resources */ = {isa = PBXBuildFile; fileRef = 378B4BCF2498F83000C00CCF /* PendingCircleAnimation.json */; };
+		378EE9A3250126BE009615B5 /* CustomBridgesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378EE9A2250126BE009615B5 /* CustomBridgesViewController.swift */; };
 		379D27AF244EF25000F1AD98 /* NavigationBarWithSubtitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379D27AE244EF25000F1AD98 /* NavigationBarWithSubtitle.swift */; };
 		379D27BA244F091A00F1AD98 /* NavigationBarWithSubtitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379D27AE244EF25000F1AD98 /* NavigationBarWithSubtitle.swift */; };
 		379D27BB244F091B00F1AD98 /* NavigationBarWithSubtitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379D27AE244EF25000F1AD98 /* NavigationBarWithSubtitle.swift */; };
-		379E754F24FFC5C100C29A27 /* AdvancedSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E885E24FE6ED100576F61 /* AdvancedSettingsViewController.swift */; };
-		379E755024FFC5C200C29A27 /* AdvancedSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E885E24FE6ED100576F61 /* AdvancedSettingsViewController.swift */; };
-		379E755224FFC5F000C29A27 /* BridgesConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E886024FE7AE800576F61 /* BridgesConfigurationViewController.swift */; };
-		379E755324FFC5F000C29A27 /* BridgesConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E886024FE7AE800576F61 /* BridgesConfigurationViewController.swift */; };
 		37ABB69024781CE800F08163 /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABB68F24781CE800F08163 /* UILabel.swift */; };
 		37ABB69124781CE800F08163 /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABB68F24781CE800F08163 /* UILabel.swift */; };
 		37ABB69224781CE800F08163 /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABB68F24781CE800F08163 /* UILabel.swift */; };
@@ -798,6 +795,7 @@
 		37875E4324D85C4300C0595B /* LoadingGIFButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingGIFButton.swift; sourceTree = "<group>"; };
 		37875E4724D8787A00C0595B /* TxTableViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxTableViewModel.swift; sourceTree = "<group>"; };
 		378B4BCF2498F83000C00CCF /* PendingCircleAnimation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = PendingCircleAnimation.json; sourceTree = "<group>"; };
+		378EE9A2250126BE009615B5 /* CustomBridgesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBridgesViewController.swift; sourceTree = "<group>"; };
 		379D27AE244EF25000F1AD98 /* NavigationBarWithSubtitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarWithSubtitle.swift; sourceTree = "<group>"; };
 		37ABB68F24781CE800F08163 /* UILabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabel.swift; sourceTree = "<group>"; };
 		37ABB69324781F8600F08163 /* UILabelWithPadding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILabelWithPadding.swift; sourceTree = "<group>"; };
@@ -1403,6 +1401,7 @@
 			children = (
 				370E885E24FE6ED100576F61 /* AdvancedSettingsViewController.swift */,
 				370E886024FE7AE800576F61 /* BridgesConfigurationViewController.swift */,
+				378EE9A2250126BE009615B5 /* CustomBridgesViewController.swift */,
 			);
 			path = AdvancedSettings;
 			sourceTree = "<group>";
@@ -2273,6 +2272,7 @@
 				004997B32382ED68000A0B7D /* PendingInboundTx.swift in Sources */,
 				370E886324FE974100576F61 /* OnionSettings.swift in Sources */,
 				0087A1B223F4235400B89EE7 /* AddRecipientViewController.swift in Sources */,
+				378EE9A3250126BE009615B5 /* CustomBridgesViewController.swift in Sources */,
 				3745508A24B8886C006295C8 /* ICloudServiceMock.swift in Sources */,
 				0091D4A723ED879E004BF7F7 /* Signature.swift in Sources */,
 				0053873024065F6C00901A68 /* SlideView.swift in Sources */,
@@ -2405,7 +2405,6 @@
 				00D7BD8A24349AE3009DD097 /* UIDevice.swift in Sources */,
 				00F53A6B24290FAE00448466 /* StorageCleanup.swift in Sources */,
 				37ABB69524781F8600F08163 /* UILabelWithPadding.swift in Sources */,
-				379E755224FFC5F000C29A27 /* BridgesConfigurationViewController.swift in Sources */,
 				37B48A8424B3968F00F8A8D2 /* BPKeychainWrapper.swift in Sources */,
 				004277E823DF4A5600AE7BD9 /* FeedbackView.swift in Sources */,
 				37CB9F8B2451A2AD00C495F2 /* String+Emoji.swift in Sources */,
@@ -2491,7 +2490,6 @@
 				373CCDC62490F3B600D0A2C9 /* FileManager+SecureCopy.swift in Sources */,
 				37B444AA248949B800592D92 /* Checkbox.swift in Sources */,
 				00BBD813237E9EE200EBF5E6 /* PrivateKey.swift in Sources */,
-				379E754F24FFC5C100C29A27 /* AdvancedSettingsViewController.swift in Sources */,
 				BFF1ED9E2408111000CC9EF6 /* SendingTariViewController.swift in Sources */,
 				001F6CE12380198D00FA7002 /* Contacts.swift in Sources */,
 				00369D84242618A900BAB95B /* TariLogger.swift in Sources */,
@@ -2523,7 +2521,6 @@
 				00C185C62390221A0096984E /* DevelopmentUI.swift in Sources */,
 				0039B1B423FA925500F91E0F /* PasteEmojisView.swift in Sources */,
 				BFC5532723D9B8E4009130A8 /* UIView.swift in Sources */,
-				379E755324FFC5F000C29A27 /* BridgesConfigurationViewController.swift in Sources */,
 				BFD758E823E98ABD00B0F1A5 /* ProfileViewController.swift in Sources */,
 				37ABB69224781CE800F08163 /* UILabel.swift in Sources */,
 				00E491C12366E08F007B332D /* MobileWalletUITests.swift in Sources */,
@@ -2645,7 +2642,6 @@
 				004997B52382ED68000A0B7D /* PendingInboundTx.swift in Sources */,
 				00230B042376C75B00F23E34 /* TxsTableViewControllerExtension.swift in Sources */,
 				37BB696D245705E70013AC4D /* RadialGradientView.swift in Sources */,
-				379E755024FFC5C200C29A27 /* AdvancedSettingsViewController.swift in Sources */,
 				00A66529243C766D0046E730 /* ConnectionMonitor.swift in Sources */,
 				619198F3E20DFABEB23F63FE /* UTXO.swift in Sources */,
 			);

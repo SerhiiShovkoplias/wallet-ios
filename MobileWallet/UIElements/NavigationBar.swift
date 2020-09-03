@@ -153,7 +153,9 @@ class NavigationBar: UIView, NavigationBarProtocol {
 
         rightButton.translatesAutoresizingMaskIntoConstraints = false
         rightButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
-        rightButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15.0).isActive = true
+        let trailing = rightButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15.0)
+        trailing.isActive = true
+        trailing.priority = .defaultLow
         rightButton.heightAnchor.constraint(equalToConstant: 45).isActive = true
         rightButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 15).isActive = true
         rightButton.addTarget(self, action: #selector(rightButtonAction(_sender:)), for: .touchUpInside)

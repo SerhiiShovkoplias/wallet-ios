@@ -49,8 +49,7 @@ class BridgesConfigurationViewController: SettingsParentTableViewController {
     }()
 
     private enum Section: Int {
-        case requestBridges
-        case chooseBridge
+        case chooseBridge = 1
     }
 
     private enum BridgesConfigurationItemTitle: CaseIterable {
@@ -84,21 +83,28 @@ class BridgesConfigurationViewController: SettingsParentTableViewController {
         return description.joined(separator: "\n")
     }()
 
-    private let requestBridgesSectionItems: [SystemMenuTableViewCellItem] = [
-        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.requestBridgesFromTorproject.rawValue)
-    ]
+    private lazy var chooseBridgeSectionItems: [SystemMenuTableViewCellItem] = {
+        getBridgeSectionItems()
+    }()
 
-    private let chooseBridgeSectionItems: [SystemMenuTableViewCellItem] = [
-        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.noBridges.rawValue, mark: OnionConnector.shared.bridgesConfiguration.bridges == BridgesType.none ? .scheduled : .none, hasArrow: false),
-        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.obfs4.rawValue, mark: OnionConnector.shared.bridgesConfiguration.bridges == BridgesType.obfs4 ? .scheduled : .none, hasArrow: false),
-        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.meekazure.rawValue, mark: OnionConnector.shared.bridgesConfiguration.bridges == BridgesType.meekazure ? .scheduled : .none, hasArrow: false),
-        SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.custom.rawValue, mark: OnionConnector.shared.bridgesConfiguration.bridges == BridgesType.custom ? .scheduled : .none)
-    ]
+    private func getBridgeSectionItems() -> [SystemMenuTableViewCellItem] {
+        [
+            SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.noBridges.rawValue, mark: OnionConnector.shared.bridgesConfiguration.bridges == BridgesType.none ? .scheduled : .none, hasArrow: false),
+            SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.obfs4.rawValue, mark: OnionConnector.shared.bridgesConfiguration.bridges == BridgesType.obfs4 ? .scheduled : .none, hasArrow: false),
+            SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.meekazure.rawValue, mark: OnionConnector.shared.bridgesConfiguration.bridges == BridgesType.meekazure ? .scheduled : .none, hasArrow: false),
+            SystemMenuTableViewCellItem(title: BridgesConfigurationItemTitle.custom.rawValue, mark: OnionConnector.shared.bridgesConfiguration.bridges == BridgesType.custom ? .scheduled : .none)
+        ]
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        chooseBridgeSectionItems = getBridgeSectionItems()
+        tableView.reloadData()
     }
 }
 
@@ -107,16 +113,18 @@ extension BridgesConfigurationViewController {
     override func setupNavigationBar() {
         super.setupNavigationBar()
         navigationBar.title = NSLocalizedString("bridges_configuration.title", comment: "BridgesConfiguration view")
-
+        navigationBar.rightButton.isEnabled = false
         navigationBar.rightButtonAction = { [weak self] in
             guard let self = self else { return }
             OnionConnector.shared.bridgesConfiguration = self.bridgesConfiguration
-            //self?.dismiss(animated: true, completion: nil)
+            self.dismiss(animated: true, completion: nil)
         }
 
         let title = NSLocalizedString("bridges_configuration.connect", comment: "BridgesConfiguration view")
         navigationBar.rightButton.setTitle(title, for: .normal)
         navigationBar.rightButton.setTitleColor(Theme.shared.colors.settingsDoneButtonTitle, for: .normal)
+        navigationBar.rightButton.setTitleColor(Theme.shared.colors.settingsDoneButtonTitle?.withAlphaComponent(0.5), for: .highlighted)
+        navigationBar.rightButton.setTitleColor(Theme.shared.colors.settingsDoneButtonTitle?.withAlphaComponent(0.25), for: .disabled)
         navigationBar.rightButton.titleLabel?.font = Theme.shared.fonts.settingsDoneButton
     }
 }
@@ -129,8 +137,6 @@ extension BridgesConfigurationViewController: UITableViewDelegate, UITableViewDa
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let section = Section(rawValue: section) else { return 0 }
         switch section {
-        case .requestBridges:
-            return requestBridgesSectionItems.count
         case .chooseBridge:
             return chooseBridgeSectionItems.count
         }
@@ -141,7 +147,6 @@ extension BridgesConfigurationViewController: UITableViewDelegate, UITableViewDa
         guard let section = Section(rawValue: indexPath.section) else { return cell }
 
         switch section {
-        case .requestBridges: cell.configure(requestBridgesSectionItems[indexPath.row])
         case .chooseBridge: cell.configure(chooseBridgeSectionItems[indexPath.row])
         }
 
@@ -153,6 +158,14 @@ extension BridgesConfigurationViewController: UITableViewDelegate, UITableViewDa
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         65
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return nil
+    }
+
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        0.0
     }
 
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -183,13 +196,7 @@ extension BridgesConfigurationViewController: UITableViewDelegate, UITableViewDa
         guard let section = Section(rawValue: indexPath.section) else { return }
 
         switch section {
-        case .requestBridges: return
         case .chooseBridge:
-            chooseBridgeSectionItems.forEach { (item) in
-                item.mark = .none
-            }
-            chooseBridgeSectionItems[indexPath.row].mark = .scheduled
-
             let raw = BridgesConfigurationItemTitle.allCases[indexPath.section + indexPath.row]
 
             switch raw {
@@ -200,10 +207,17 @@ extension BridgesConfigurationViewController: UITableViewDelegate, UITableViewDa
             case .meekazure:
                 bridgesConfiguration.bridges = BridgesType.meekazure
             case .custom:
-                bridgesConfiguration.bridges = BridgesType.custom
+                navigationController?.pushViewController(CustomBridgesViewController(bridgesConfiguration: bridgesConfiguration), animated: true)
+                return
             default:
                 return
             }
+            bridgesConfiguration.customBridges = nil
+            navigationBar.rightButton.isEnabled = OnionSettings.currentlyUsedBridges != bridgesConfiguration.bridges
+            chooseBridgeSectionItems.forEach { (item) in
+                item.mark = .none
+            }
+            chooseBridgeSectionItems[indexPath.row].mark = .scheduled
         }
     }
 }
