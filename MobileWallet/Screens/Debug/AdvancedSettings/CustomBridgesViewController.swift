@@ -100,6 +100,11 @@ extension CustomBridgesViewController {
         navigationBar.rightButtonAction = { [weak self] in
             guard let self = self else { return }
             if self.bridgesConfiguration == nil { return }
+            OnionConnector.shared.addObserver(self)
+            self.navigationBar.setProgress(0.0)
+            self.navigationBar.progressView.isHidden = false
+            self.navigationBar.rightButton.isEnabled = false
+            self.view.isUserInteractionEnabled = false
 
             self.bridgesConfiguration?.customBridges = self.customBridgeField.text
                     .components(separatedBy: "\n")
@@ -109,15 +114,21 @@ extension CustomBridgesViewController {
             self.bridgesConfiguration?.bridges = self.bridgesConfiguration?.customBridges?.isEmpty == true ? .none : .custom
             OnionConnector.shared.bridgesConfiguration = self.bridgesConfiguration!
             self.customBridgeField.resignFirstResponder()
-            self.dismiss(animated: true, completion: nil)
         }
 
         let title = NSLocalizedString("custom_bridges.connect", comment: "CustomBridges view")
         navigationBar.rightButton.setTitle(title, for: .normal)
-        navigationBar.rightButton.setTitleColor(Theme.shared.colors.settingsDoneButtonTitle, for: .normal)
-        navigationBar.rightButton.setTitleColor(Theme.shared.colors.settingsDoneButtonTitle?.withAlphaComponent(0.5), for: .highlighted)
-        navigationBar.rightButton.setTitleColor(Theme.shared.colors.settingsDoneButtonTitle?.withAlphaComponent(0.25), for: .disabled)
+        navigationBar.rightButton.setTitleColor(Theme.shared.colors.navigationBarPurple, for: .normal)
+        navigationBar.rightButton.setTitleColor(Theme.shared.colors.navigationBarPurple?.withAlphaComponent(0.5), for: .highlighted)
+        navigationBar.rightButton.setTitleColor(Theme.shared.colors.navigationBarPurple?.withAlphaComponent(0.25), for: .disabled)
         navigationBar.rightButton.titleLabel?.font = Theme.shared.fonts.settingsDoneButton
+    }
+
+    override func onTorConnDifficulties() {
+        super.onTorConnDifficulties()
+        let currentBridgesStr = backupTorBridgesConfiguration.customBridges?.joined(separator: "\n")
+        customBridgeField.text = (currentBridgesStr?.isEmpty ?? true) ? OnionManager.obfs4Bridges.first : currentBridgesStr
+
     }
 }
 
@@ -148,6 +159,7 @@ extension CustomBridgesViewController: UITableViewDelegate, UITableViewDataSourc
         cell.preservesSuperviewLayoutMargins = false
         cell.separatorInset = .zero
         cell.layoutMargins = .zero
+
         return cell
     }
 

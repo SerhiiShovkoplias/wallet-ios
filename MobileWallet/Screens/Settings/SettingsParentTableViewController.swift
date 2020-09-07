@@ -44,6 +44,7 @@ class SettingsParentTableViewController: SettingsParentViewController {
     let tableView = UITableView(frame: .zero, style: .grouped)
 
     var backUpWalletItem: SystemMenuTableViewCellItem?
+    let backupTorBridgesConfiguration: BridgesConfuguration = OnionConnector.shared.bridgesConfiguration
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -124,5 +125,31 @@ extension SettingsParentTableViewController {
         tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+    }
+}
+
+extension SettingsParentTableViewController: OnionConnectorObserver {
+    func onTorConnProgress(_ progress: Int) {
+        navigationBar.setProgress(Float(progress) / 100.0)
+    }
+
+    func onTorConnDifficulties(error: OnionError) {
+        UserFeedback.shared.error(title: error.failureReason ?? "Onion Error", description: error.localizedDescription, error: nil)
+    }
+
+    func onTorConnFinished() {
+        OnionConnector.shared.removeObserver(self)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.navigationBar.progressView.isHidden = true
+            self.view.isUserInteractionEnabled = true
+            self.tableView.reloadData()
+        }
+    }
+
+    @objc func onTorConnDifficulties() {
+        OnionConnector.shared.removeObserver(self)
+        OnionConnector.shared.bridgesConfiguration = backupTorBridgesConfiguration
+        navigationBar.progressView.isHidden = true
+        view.isUserInteractionEnabled = true
     }
 }

@@ -129,11 +129,14 @@
 
 "settings.done" = "Done";
 "settings.item.header.more" = "More";
+"settings.item.header.advanced_settings" = "Advanced Settings";
 "settings.item.header.security" = "Security";
 
 "settings.last_successful_backup.with_param" = "Last successful backup: %@";
 
 "settings.item.wallet_backups" = "Wallet Backups";
+"settings.item.bridge_configuration" = "Bridge Configuration";
+
 "settings.item.contribute_to_tari" = "Contribute to Tari Aurora";
 "settings.item.disclaimer" = "Disclaimer";
 "settings.item.privacy_policy" = "Privacy Policy";
@@ -416,3 +419,9 @@
 "custom_bridges.item.request_bridges_from_torproject" = "Request Bridges from torproject.org";
 "custom_bridges.item.scan_QR_code" = "Scan QR Code";
 "custom_bridges.item.upload_QR_code" = "Upload QR Code";
+
+/* Onion error */
+"Onion_Error.error.missing_cookie_file" = "Tor connection error. Missing cookie file";
+"Onion_Error.error.connectionError" = "Tor connection error. Please, check your network connection";
+"Onion_Error.error.invalid_bridges" = "Invalid Bridges. Settings returned to previous bridges";
+"Onion_Error.error.title.onionError" = "Onion Error";

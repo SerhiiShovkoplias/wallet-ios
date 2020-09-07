@@ -116,15 +116,19 @@ extension BridgesConfigurationViewController {
         navigationBar.rightButton.isEnabled = false
         navigationBar.rightButtonAction = { [weak self] in
             guard let self = self else { return }
+            OnionConnector.shared.addObserver(self)
+            self.navigationBar.setProgress(0.0)
+            self.navigationBar.progressView.isHidden = false
+            self.navigationBar.rightButton.isEnabled = false
+            self.view.isUserInteractionEnabled = false
             OnionConnector.shared.bridgesConfiguration = self.bridgesConfiguration
-            self.dismiss(animated: true, completion: nil)
         }
 
         let title = NSLocalizedString("bridges_configuration.connect", comment: "BridgesConfiguration view")
         navigationBar.rightButton.setTitle(title, for: .normal)
-        navigationBar.rightButton.setTitleColor(Theme.shared.colors.settingsDoneButtonTitle, for: .normal)
-        navigationBar.rightButton.setTitleColor(Theme.shared.colors.settingsDoneButtonTitle?.withAlphaComponent(0.5), for: .highlighted)
-        navigationBar.rightButton.setTitleColor(Theme.shared.colors.settingsDoneButtonTitle?.withAlphaComponent(0.25), for: .disabled)
+        navigationBar.rightButton.setTitleColor(Theme.shared.colors.navigationBarPurple, for: .normal)
+        navigationBar.rightButton.setTitleColor(Theme.shared.colors.navigationBarPurple?.withAlphaComponent(0.5), for: .highlighted)
+        navigationBar.rightButton.setTitleColor(Theme.shared.colors.navigationBarPurple?.withAlphaComponent(0.25), for: .disabled)
         navigationBar.rightButton.titleLabel?.font = Theme.shared.fonts.settingsDoneButton
     }
 }

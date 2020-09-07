@@ -414,6 +414,7 @@
 		37765D2624A35BA20091AE2A /* AESEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37765D2524A35BA20091AE2A /* AESEncryption.swift */; };
 		37765D2724A35BA20091AE2A /* AESEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37765D2524A35BA20091AE2A /* AESEncryption.swift */; };
 		37765D2824A35BA20091AE2A /* AESEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37765D2524A35BA20091AE2A /* AESEncryption.swift */; };
+		377A872E2506820800DC6C3F /* NSPointerArray+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CFAA75248FE28600DEA096 /* NSPointerArray+Extension.swift */; };
 		37875E4424D85C4300C0595B /* LoadingGIFButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37875E4324D85C4300C0595B /* LoadingGIFButton.swift */; };
 		37875E4524D85C4300C0595B /* LoadingGIFButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37875E4324D85C4300C0595B /* LoadingGIFButton.swift */; };
 		37875E4624D85C4300C0595B /* LoadingGIFButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37875E4324D85C4300C0595B /* LoadingGIFButton.swift */; };
@@ -2204,6 +2205,7 @@
 				370E886624FE97E200576F61 /* OnionSettings.swift in Sources */,
 				00C520C2246972140077BF7F /* ByteVector.swift in Sources */,
 				00C520CB246972180077BF7F /* CompletedTxs.swift in Sources */,
+				377A872E2506820800DC6C3F /* NSPointerArray+Extension.swift in Sources */,
 				00C520B42469720A0077BF7F /* OnionManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

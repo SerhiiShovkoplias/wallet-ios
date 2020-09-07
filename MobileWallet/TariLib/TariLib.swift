@@ -234,35 +234,8 @@ class TariLib {
         }
 
         TariEventBus.postToMainThread(.torConnectionProgress, sender: Int(0))
-        OnionConnector.shared.start(
-            onProgress: { [weak self] percentage in
-                guard let _ = self else { return }
-
-                TariEventBus.postToMainThread(.torConnectionProgress, sender: percentage)
-            },
-            onPortsOpen: { [weak self] in
-                guard let self = self else { return }
-                self.torPortsOpened = true
-                TariEventBus.postToMainThread(.torPortsOpened, sender: nil)
-            },
-            onCompletion: { [weak self] result in
-                guard let self = self else { return }
-
-                switch result {
-                    case .success(let urlSessionConfiguration):
-                        TariEventBus.postToMainThread(.torConnectionProgress, sender: Int(100))
-                        TariEventBus.postToMainThread(.torConnected, sender: nil)
-
-                        try? self.tariWallet?.syncBaseNode()
-                    case .failure(let error):
-                        TariLogger.error("Tor connection failed to complete", error: error)
-                        TariEventBus.postToMainThread(.torConnectionFailed, sender: error)
-
-                        //Might as well keep trying
-                        self.startTor()
-                }
-            }
-        )
+        OnionConnector.shared.addObserver(self)
+        OnionConnector.shared.start()
     }
 
     func stopTor() {
@@ -413,5 +386,31 @@ class TariLib {
             }
             waitingTime += timer.timeInterval
         }
+    }
+}
+
+extension TariLib: OnionConnectorObserver {
+    func onTorConnProgress(_ progress: Int) {
+        TariEventBus.postToMainThread(.torConnectionProgress, sender: progress)
+    }
+
+    func onTorPortsOpened() {
+        self.torPortsOpened = true
+        TariEventBus.postToMainThread(.torPortsOpened, sender: nil)
+    }
+
+    func onTorConnDifficulties(error: OnionError) {
+        TariLogger.error("Tor connection failed to complete", error: error)
+        TariEventBus.postToMainThread(.torConnectionFailed, sender: error)
+
+        //Might as well keep trying
+        self.startTor()
+    }
+
+    func onTorConnFinished() {
+        TariEventBus.postToMainThread(.torConnectionProgress, sender: Int(100))
+        TariEventBus.postToMainThread(.torConnected, sender: nil)
+
+        try? self.tariWallet?.syncBaseNode()
     }
 }

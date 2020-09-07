@@ -53,11 +53,6 @@ extension UIViewController: MFMailComposeViewControllerDelegate {
 
     private static var debugMenuAlert: UIAlertController?
 
-    private func showAdvancedSettings() {
-        let navigationController = AlwaysPoppableNavigationController(rootViewController: AdvancedSettingsViewController())
-        self.navigationController?.present(navigationController, animated: true)
-    }
-
     private func showTariLibLogs() {
         if navigationController?.topViewController is DebugLogsTableViewController {
             return
@@ -257,16 +252,6 @@ extension UIViewController: MFMailComposeViewControllerDelegate {
         guard let alert = UIViewController.debugMenuAlert else {
             return
         }
-
-        alert.addAction(
-        UIAlertAction(
-            title: "Advanced Settings",
-            style: .default,
-            handler: {
-                (_) in
-                UIViewController.debugMenuAlert = nil
-                self.showAdvancedSettings()
-        }))
 
         alert.addAction(
             UIAlertAction(
