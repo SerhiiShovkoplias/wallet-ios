@@ -302,9 +302,11 @@
 "navigation_bar.error.show_emoji.description" = "Failed to get Emoji ID from user's contact";
 
 /* Scan view */
+"scan_view.scan_qr_to_set_bridges" = "Scan a QR code to set custom bridges";
 "scan_view.scan_qr_to_send.with_param" = "Scan a Tari QR code to send %@ to the recipient.";
 "scan_view.error.title" = "Scanning error";
-"scan_view.error.description" = "Failed to import user's public key";
+"scan_view.error.public_key.description" = "Failed to import user's public key";
+"scan_view.error.bridges.description" = "Bridges from QR Code could not be decoded";
 
 /* RestoreWallet view */
 "restore_wallet.title" = "Restore Your Wallet";
@@ -419,6 +421,9 @@
 "custom_bridges.item.request_bridges_from_torproject" = "Request Bridges from torproject.org";
 "custom_bridges.item.scan_QR_code" = "Scan QR Code";
 "custom_bridges.item.upload_QR_code" = "Upload QR Code";
+
+"custom_bridges.error.image_decode.title" = "QR code decode error";
+"custom_bridges.error.image_decode.description" = "Failed to decode QR Code from image";
 
 /* Onion error */
 "Onion_Error.error.missing_cookie_file" = "Tor connection error. Missing cookie file";

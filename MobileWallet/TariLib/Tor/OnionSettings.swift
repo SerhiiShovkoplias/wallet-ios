@@ -41,6 +41,8 @@
 import Foundation
 
 class OnionSettings: NSObject {
+    static let torBridgesLink = URL(string: "https://bridges.torproject.org/bridges")!
+
     enum BridgesType: Int {
         case none
         case obfs4

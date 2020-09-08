@@ -63,6 +63,7 @@ class CustomBridgesViewController: SettingsParentTableViewController {
 
     weak var bridgesConfiguration: BridgesConfuguration?
     private let customBridgeField = UITextView()
+    private lazy var detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
 
     private let requestBridgesSectionItems: [SystemMenuTableViewCellItem] = [
         SystemMenuTableViewCellItem(title: CustomBridgesTitle.requestBridgesFromTorproject.rawValue)
@@ -86,8 +87,6 @@ class CustomBridgesViewController: SettingsParentTableViewController {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
-
-        view.addGestureRecognizer(UITapGestureRecognizer.init(target: view, action: #selector(customBridgeField.endEditing(_:))))
     }
 }
 
@@ -129,6 +128,59 @@ extension CustomBridgesViewController {
         let currentBridgesStr = backupTorBridgesConfiguration.customBridges?.joined(separator: "\n")
         customBridgeField.text = (currentBridgesStr?.isEmpty ?? true) ? OnionManager.obfs4Bridges.first : currentBridgesStr
 
+    }
+
+    private func openScannerVC() {
+        let vc = ScanViewController(scanResourceType: .bridges)
+        vc.actionDelegate = self
+        vc.modalPresentationStyle = .popover
+        present(vc, animated: true, completion: nil)
+    }
+
+    private func openImagePickerVC() {
+        let vc = UIImagePickerController()
+        vc.delegate = self
+        vc.modalPresentationStyle = .popover
+        present(vc, animated: true, completion: nil)
+    }
+}
+
+extension CustomBridgesViewController: ScanViewControllerDelegate {
+    func onAdd(string: String) {
+        customBridgeField.text = string
+        textViewDidChange(customBridgeField)
+    }
+}
+
+extension CustomBridgesViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        picker.dismiss(animated: true)
+
+        var raw = ""
+
+        if let image = (info[.editedImage] ?? info[.originalImage]) as? UIImage,
+            let ciImage = image.ciImage ?? (image.cgImage != nil ? CIImage(cgImage: image.cgImage!) : nil) {
+
+            let features = detector?.features(in: ciImage)
+
+            for feature in features as? [CIQRCodeFeature] ?? [] {
+                raw += feature.messageString ?? ""
+            }
+        }
+
+        if let bridges = raw.findBridges() {
+            onAdd(string: bridges)
+        } else {
+            UserFeedback.shared.error(
+                title: NSLocalizedString("custom_bridges.error.image_decode.title", comment: "Scan view"),
+                description: NSLocalizedString("custom_bridges.error.image_decode.description", comment: "Scan view"),
+                error: nil
+            )
+        }
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
     }
 }
 
@@ -219,6 +271,20 @@ extension CustomBridgesViewController: UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         guard let section = Section(rawValue: indexPath.section) else { return }
+        switch section {
+        case .requestBridges:
+            UserFeedback.shared.openWebBrowser(url: OnionSettings.torBridgesLink)
+        case .QRcode:
+            if CustomBridgesTitle.allCases[indexPath.row + indexPath.section] == .scanQRCode {
+                openScannerVC()
+                return
+            }
+            if CustomBridgesTitle.allCases[indexPath.row + indexPath.section] == .uploadQRCode {
+                openImagePickerVC()
+                return
+            }
+
+        }
 
     }
 }

@@ -335,7 +335,6 @@
 		3708D757247FF81900807D72 /* SettingsParentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3708D755247FF81900807D72 /* SettingsParentViewController.swift */; };
 		3708D758247FF81900807D72 /* SettingsParentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3708D755247FF81900807D72 /* SettingsParentViewController.swift */; };
 		37098043249CD48A0004ED2E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 37098045249CD48A0004ED2E /* Localizable.strings */; };
-		370E885F24FE6ED100576F61 /* AdvancedSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E885E24FE6ED100576F61 /* AdvancedSettingsViewController.swift */; };
 		370E886124FE7AE800576F61 /* BridgesConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E886024FE7AE800576F61 /* BridgesConfigurationViewController.swift */; };
 		370E886324FE974100576F61 /* OnionSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E886224FE974100576F61 /* OnionSettings.swift */; };
 		370E886424FE97E100576F61 /* OnionSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370E886224FE974100576F61 /* OnionSettings.swift */; };
@@ -763,7 +762,6 @@
 		3708D751247FF7D000807D72 /* BackupWalletSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupWalletSettingsViewController.swift; sourceTree = "<group>"; };
 		3708D755247FF81900807D72 /* SettingsParentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsParentViewController.swift; sourceTree = "<group>"; };
 		37098044249CD48A0004ED2E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		370E885E24FE6ED100576F61 /* AdvancedSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsViewController.swift; sourceTree = "<group>"; };
 		370E886024FE7AE800576F61 /* BridgesConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgesConfigurationViewController.swift; sourceTree = "<group>"; };
 		370E886224FE974100576F61 /* OnionSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnionSettings.swift; sourceTree = "<group>"; };
 		370E886824FE9DEB00576F61 /* obfs4-bridges.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "obfs4-bridges.plist"; sourceTree = "<group>"; };
@@ -1400,7 +1398,6 @@
 		370E885D24FE6E9A00576F61 /* AdvancedSettings */ = {
 			isa = PBXGroup;
 			children = (
-				370E885E24FE6ED100576F61 /* AdvancedSettingsViewController.swift */,
 				370E886024FE7AE800576F61 /* BridgesConfigurationViewController.swift */,
 				378EE9A2250126BE009615B5 /* CustomBridgesViewController.swift */,
 			);
@@ -2304,7 +2301,6 @@
 				37547D5624601BF600EB59CC /* UIView+GlobalFrame.swift in Sources */,
 				BF8316FD23EF7EAA00235403 /* LAContext.swift in Sources */,
 				375894C524865A6A00B58816 /* VerifyPhraseViewController.swift in Sources */,
-				370E885F24FE6ED100576F61 /* AdvancedSettingsViewController.swift in Sources */,
 				005387242405136700901A68 /* AddNoteViewController.swift in Sources */,
 				00434A9D2477D0B000C0104F /* AppContainerLock.swift in Sources */,
 				00BCE47F240D5A9700B181F3 /* OnionManager.swift in Sources */,
